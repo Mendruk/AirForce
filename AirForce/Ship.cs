@@ -1,6 +1,6 @@
 ﻿namespace AirForce
 {
-    public abstract class Ship:GameObject
+    public abstract class Ship : GameObject
     {
         private Bitmap explosion = Resource.explosion;
 
@@ -14,9 +14,11 @@
         protected int reloadingTime;
         protected int currentReloadingTime;
 
+
         public override void Update()
-        {
-            //todo
+        {            
+            base.Update();
+
             if (currentVerticalSpeed > maxVerticalSpeed)
                 currentVerticalSpeed = maxVerticalSpeed;
 
@@ -24,10 +26,10 @@
                 currentVerticalSpeed = -maxVerticalSpeed;
 
             if (currentVerticalSpeed > 0)
-                currentVerticalSpeed -= acceleration / 2;
+                currentVerticalSpeed -= 1;
 
             if (currentVerticalSpeed < 0)
-                currentVerticalSpeed += acceleration / 2;
+                currentVerticalSpeed += 1;
 
             Y += currentVerticalSpeed;
 
@@ -35,21 +37,15 @@
                 currentReloadingTime++;
         }
 
-        public abstract void Fire();
-
-
-        public void TakeDamage(int damage)
+        protected void TakeDamage(int damage)
         {
             currnetHp -= damage;
 
-            if (currnetHp < 0)
-                Die();
+            if (currnetHp <= 0)
+                Destroy();
         }
 
-        private void Die()
-        {
-            //todo
-            sprite = explosion;
-        }
+        protected abstract void Destroy();
+
     }
 }

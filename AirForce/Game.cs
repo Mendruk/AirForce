@@ -1,7 +1,8 @@
 ﻿using AirForce;
 
 public class Game
-{    
+{
+    private Random random = new Random();
     public static List<GameObject> GameObjectList = new();
 
     public static int GameFieldWidth;
@@ -20,17 +21,25 @@ public class Game
 
         ground = new Rectangle(0, gameFieldHeight / 5 * 4, gameFieldWidth, gameFieldHeight);
 
-        playerShip = new PlayerShip();
-        chaserShip = new ChaserShip();
+        playerShip = new PlayerShip
+        {
+            isEnable = true
+        };
 
         GameObjectList.Add(playerShip);
-        GameObjectList.Add(chaserShip);
     }
 
     public void Update()
     {
-        for (int i = 0; i < GameObjectList.Count; i++)
-            GameObjectList[i].Update();
+        if(random.Next(20)==10)
+            CreateEnemy();
+
+        int iMax = GameObjectList.Count;
+        for (int i = 0; i < iMax; i++)
+        {
+            if(GameObjectList[i].isEnable)
+                GameObjectList[i].Update();
+        }
 
         if (isMoveUp)
             playerShip.MoveUp();
@@ -44,9 +53,27 @@ public class Game
 
     public void Draw(Graphics graphics)
     {
-        for (int i = 0; i < GameObjectList.Count; i++)
-            GameObjectList[i].Draw(graphics);
+        //todo
+        int iMax = GameObjectList.Count;
+
+        for (int i = 0; i < iMax; i++)
+        {
+            if (GameObjectList[i].isEnable)
+                GameObjectList[i].Draw(graphics);
+        }
 
         graphics.FillRectangle(Brushes.DarkSlateGray, ground);
+    }
+
+    private void CreateEnemy()
+    {
+        if(ChaserShip.Pull.Count==0)
+            return;
+
+        GameObject enemy = ChaserShip.Pull.Dequeue();
+
+        enemy.X = GameFieldWidth+50;
+        enemy.Y = random.Next(50, GameFieldHeight / 5 * 4);
+        enemy.isEnable = true;
     }
 }

@@ -32,6 +32,7 @@ namespace AirForce
 
         private void MainForm_Paint(object sender, PaintEventArgs e)
         {
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
             e.Graphics.FillRectangle(gradientBrush, 0, 0, Width, Height);
             game.Draw(e.Graphics);
         }
