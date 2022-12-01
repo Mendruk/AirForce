@@ -2,78 +2,107 @@
 
 public class Game
 {
-    private Random random = new Random();
-    public static List<GameObject> GameObjectList = new();
+    public static Random Random = new Random();
+    public static List<GameObject> GameObjects = new();
 
-    public static int GameFieldWidth;
-    public static int GameFieldHeight;
-    
+    public int Health => playerShip.Health;
+    public int Score;
+
+    private Dictionary<CollisionTags, CollisionTags[]> collisions = new Dictionary<CollisionTags, CollisionTags[]>()
+    {
+        { CollisionTags.Player, new[] {CollisionTags.Bird, CollisionTags.EnemyBullet, CollisionTags.Enemy, CollisionTags.Ground } },
+        { CollisionTags.PlayerBullet, new[]{ CollisionTags.Enemy, CollisionTags.Ground } },
+        { CollisionTags.Enemy, new[] { CollisionTags.PlayerBullet, CollisionTags.Ground } }
+    };
+
+    private int gameFieldWidth;
+    private int gameFieldHeight;
+
     private Rectangle ground;
+    private int groundY;
+
     private PlayerShip playerShip;
-    private ChaserShip chaserShip;
 
     public bool isMoveUp, isMoveDown, isFire;
 
     public Game(int gameFieldWidth, int gameFieldHeight)
     {
-        GameFieldHeight=gameFieldHeight;
-        GameFieldWidth=gameFieldWidth;
+        this.gameFieldHeight = gameFieldHeight;
+        this.gameFieldWidth = gameFieldWidth;
 
-        ground = new Rectangle(0, gameFieldHeight / 5 * 4, gameFieldWidth, gameFieldHeight);
+        groundY = gameFieldHeight / 5 * 4;
+        ground = new Rectangle(0, groundY, gameFieldWidth, gameFieldHeight);
 
-        playerShip = new PlayerShip
-        {
-            isEnable = true
-        };
+        playerShip = new PlayerShip(100, 500);
 
-        GameObjectList.Add(playerShip);
+        GameObjects.Add(playerShip);
     }
 
     public void Update()
     {
-        if(random.Next(20)==10)
+        if (Random.Next(10) == 5)
             CreateEnemy();
 
-        int iMax = GameObjectList.Count;
-        for (int i = 0; i < iMax; i++)
+        int listCount = GameObjects.Count;
+
+        GameObject gameObject1;
+        GameObject gameObject2;
+
+        for (int i = 0; i < listCount; i++)
         {
-            if(GameObjectList[i].isEnable)
-                GameObjectList[i].Update();
+            gameObject1 = GameObjects[i];
+
+            for (int j = i + 1; j < listCount; j++)
+            {
+                gameObject2 = GameObjects[j];
+
+                if (gameObject1.DistanceToObject(gameObject2) < 100)
+                {
+                    if (!IsCollision(gameObject1.Tag, gameObject2.Tag))
+                        continue;
+
+                    int health1 = gameObject1.Health;
+                    gameObject1.TakeDamage(gameObject2.Health);
+                    gameObject2.TakeDamage(health1);
+                }
+            }
+
+            gameObject1.Update();
         }
 
         if (isMoveUp)
             playerShip.MoveUp();
-        
+
         if (isMoveDown)
             playerShip.MoveDown();
 
         if (isFire)
-            playerShip.Fire();
+        {
+            playerShip.Fire(GameObjects);
+        }
     }
 
     public void Draw(Graphics graphics)
     {
-        //todo
-        int iMax = GameObjectList.Count;
-
-        for (int i = 0; i < iMax; i++)
-        {
-            if (GameObjectList[i].isEnable)
-                GameObjectList[i].Draw(graphics);
-        }
+        foreach (GameObject gameObject in GameObjects)
+            gameObject.Draw(graphics);
 
         graphics.FillRectangle(Brushes.DarkSlateGray, ground);
     }
 
     private void CreateEnemy()
     {
-        if(ChaserShip.Pull.Count==0)
-            return;
+        GameObjects.Add(new ChaserShip(gameFieldWidth, Random.Next(0, groundY)));
+    }
 
-        GameObject enemy = ChaserShip.Pull.Dequeue();
-
-        enemy.X = GameFieldWidth+50;
-        enemy.Y = random.Next(50, GameFieldHeight / 5 * 4);
-        enemy.isEnable = true;
+    private bool IsCollision(CollisionTags tag1, CollisionTags tag2)
+    {
+        if (collisions.TryGetValue(tag1, out CollisionTags[] tags))
+        {
+            foreach (CollisionTags tag in tags)
+                if (tag2 == tag)
+                    return true;
+        }
+        return false;
     }
 }

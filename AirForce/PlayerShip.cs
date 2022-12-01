@@ -1,37 +1,28 @@
 ﻿namespace AirForce
 {
-    public class PlayerShip : Ship
+    public class PlayerShip : GameObject
     {
-        public PlayerShip()
+        public PlayerShip(int x, int y)
         {
+            Tag = CollisionTags.Player;
+            X = x;
+            Y = y;
             sprite = Resource.player_ship;
             size = sprite.Height;
+            frameNumber = 3;
+            CalculateFramesRectangles();
 
-            X = 100;
-            Y = Game.GameFieldHeight / 2 - sprite.Height / 2;
-
-            frameNumber = 2;
-
-            Start();
-
-            acceleration = 3;
-            maxVerticalSpeed = 8;
-
-            reloadingTime =10;
+            Health = 10;
+            maxVerticalSpeed = 12;
+            acceleration = 4;
+            reloadedTime = 10;
         }
-
-        public void Fire()
+        public override void Update()
         {
-            if (currentReloadingTime < reloadingTime)
-                return;
+            base.Update();
 
-            currentReloadingTime = 0;
-
-            PlayerBullet bullet = PlayerBullet.Pull.Dequeue();
-            bullet.isEnable = true;
-
-            bullet.X = X+size/2;
-            bullet.Y = Y;
+            if (currentRealodedTime < reloadedTime)
+                currentRealodedTime++;
         }
 
         public void MoveUp()
@@ -44,9 +35,13 @@
             currentVerticalSpeed += acceleration;
         }
 
-        protected override void Destroy()
+        public void Fire(List<GameObject> gameObjects)
         {
-            throw new NotImplementedException();
+            if (currentRealodedTime >= reloadedTime)
+            {
+                gameObjects.Add(new PlayerBullet(X + size / 2, Y));
+                currentRealodedTime = 0;
+            }
         }
     }
 }

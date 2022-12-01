@@ -32,9 +32,11 @@ namespace AirForce
 
         private void MainForm_Paint(object sender, PaintEventArgs e)
         {
-            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
             e.Graphics.FillRectangle(gradientBrush, 0, 0, Width, Height);
             game.Draw(e.Graphics);
+            e.Graphics.DrawString("Health: " + game.Health, DefaultFont, Brushes.Black, Width / 4, Height * 5 / 6);
+            e.Graphics.DrawString("Score: " + game.Score, DefaultFont, Brushes.Black, Width / 4, Height * 6 / 7);
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
