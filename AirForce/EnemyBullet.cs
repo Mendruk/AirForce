@@ -1,32 +1,32 @@
 ﻿namespace AirForce
 {
-    public class PlayerBullet : GameObject
+    public class EnemyBullet : GameObject
     {
-        public PlayerBullet(int x, int y)
+        public EnemyBullet(int x, int y)
         {
-            Tag = CollisionTags.PlayerBullet;
+            Tag = CollisionTags.EnemyBullet;
             X = x;
             Y = y;
-            sprite = Resource.player_shot;
+            sprite = Resource.enemy_shot;
             size = sprite.Height;
             frameNumber = 3;
             CalculateFramesRectangles();
             Pull.Enqueue(this);
             GameObjects.Add(this);
 
-            Health = 1;
-            horizontalSpeed = 15;
+            horizontalSpeed = -15;
             maxVerticalSpeed = 0;
             currentVerticalSpeed = 0;
             acceleration = 0;
+
+            Reset();
         }
 
         protected override void Reset()
         {
-            Health = 1;
+            Health = 1;;
             currnetFrameNumber = 0;
         }
+
     }
 }
-
-

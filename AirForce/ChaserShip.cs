@@ -8,27 +8,29 @@
             X = x;
             Y = y;
             Tag = CollisionTags.Enemy;
+            frameNumber = 3;
             sprite = Resource.chaser_ship;
             size = sprite.Height;
             CalculateFramesRectangles();
+            Pull.Enqueue(this);
+            GameObjects.Add(this);
 
-            //
-
-            Health = 1;
-            horizontalSpeed = Game.Random.Next(-15,-10);
-            maxVerticalSpeed = 10;
+            horizontalSpeed = Game.Random.Next(-10,-5);
+            maxVerticalSpeed = 5;
             currentVerticalSpeed = 1;
-            acceleration = 3;
+            acceleration = 2;
+
+            canDodge = true;
+
+            Reset();
+
         }
 
-        public void MoveUp()
+        protected override void Reset()
         {
-            currentVerticalSpeed -= acceleration;
-        }
-
-        public void MoveDown()
-        {
-            currentVerticalSpeed += acceleration;
+            Health = 1;
+            currentVerticalSpeed = 0;
+            currnetFrameNumber = 0;
         }
     }
 }

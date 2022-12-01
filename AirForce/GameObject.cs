@@ -2,6 +2,10 @@
 {
     public abstract class GameObject
     {
+        public static Queue<GameObject> Pull = new();
+        public static List<GameObject> GameObjects = new();
+
+        public bool isEnable;
         public CollisionTags Tag;
         public int Health;
 
@@ -10,19 +14,67 @@
         protected int maxVerticalSpeed;
         protected int currentVerticalSpeed;
         protected int acceleration;
-        protected bool canDodge;
+        public bool canDodge;
 
         protected int reloadedTime;
         protected int currentRealodedTime;
-        protected bool canFire;
+        public bool canFire;
+
 
         protected Bitmap sprite;
-        protected int size;
+        public int size;
 
         protected int frameNumber = 1;
-        protected int currnetFrameNumber;
+        protected int  currnetFrameNumber;
         protected List<Rectangle> frameRectangles;
 
+        public static GameObject Create(Type type, int x, int y)
+        {
+            GameObject obj;
+
+            while (true)
+            {
+                obj = Pull.Dequeue();
+                if (obj.GetType() == type)
+                {
+                    obj.isEnable = true;
+                    obj.X = x;
+                    obj.Y = y;
+                    obj.Reset();
+                    return obj;
+                }
+
+                Pull.Enqueue(obj);
+            }
+        }
+
+        //todo
+        public static GameObject Create(Type type, int x, int y, int size)
+        {
+            GameObject obj;
+            //TODO
+            while (true)
+            {
+                obj = Pull.Dequeue();
+                if (obj.GetType() == type)
+                {
+                    obj.isEnable = true;
+                    obj.X = x;
+                    obj.Y = y;
+                    obj.size = size;
+                    obj.Reset();
+                    return obj;
+                }
+
+                Pull.Enqueue(obj);
+            }
+        }
+
+        public static void Delite(GameObject gameObject)
+        {
+            gameObject.isEnable = false;
+            Pull.Enqueue(gameObject);
+        }
 
         public void Draw(Graphics graphics)
         {
@@ -30,11 +82,12 @@
 
             graphics.DrawImage(sprite, new Rectangle(X - size / 2, Y - size / 2, size, size),
                 frameRectangles[currnetFrameNumber], GraphicsUnit.Pixel);
+            ChangeAnimationFrame();
         }
 
         public virtual void Update()
         {
-            ChangeAnimationFrame();
+            //ChangeAnimationFrame();
 
             Move();
         }
@@ -46,11 +99,12 @@
 
         protected virtual void ChangeAnimationFrame()
         {
-            currnetFrameNumber++;
+            currnetFrameNumber += 1;
 
             if (currnetFrameNumber >= frameNumber)
                 currnetFrameNumber = 0;
         }
+
 
         protected void CalculateFramesRectangles()
         {
@@ -79,6 +133,9 @@
 
             X += horizontalSpeed;
             Y += currentVerticalSpeed;
+
+            if (Y < size / 2)
+                Y = size / 2;
         }
 
         public void Dodge(Directions direction)
@@ -86,23 +143,36 @@
             switch (direction)
             {
                 case Directions.Up:
-                    acceleration = 2;
+                    currentVerticalSpeed += acceleration;
                     break;
                 case Directions.Down:
-                    acceleration = -2;
+                    currentVerticalSpeed -= acceleration;
                     break;
                 default://todo
                     break;
             }
         }
 
-        public void TakeDamage(int damage)
+        //todo
+        public virtual void Fire()
         {
-            Health-=damage;
-            if (Health <= 0)
+            if (currentRealodedTime >= reloadedTime)
             {
-               // Game.GameObjects[Game.GameObjects.IndexOf(this)] = new Explosion(X, Y);
+                Create(typeof(EnemyBullet), X, Y);
+                currentRealodedTime = 0;
             }
         }
+
+        public virtual void TakeDamage(int damage)
+        {
+            Health -= damage;
+            if (Health <= 0)
+            {
+                Delite(this);
+                Create(typeof(Explosion), X, Y, size);
+            }
+        }
+
+        protected abstract void Reset();
     }
 }

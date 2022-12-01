@@ -11,12 +11,24 @@
             size = sprite.Height;
             frameNumber = 3;
             CalculateFramesRectangles();
+            Pull.Enqueue(this);
+            GameObjects.Add(this);
 
-            Health = 10;
             maxVerticalSpeed = 12;
             acceleration = 4;
             reloadedTime = 10;
+
+            Reset();
         }
+
+        protected override void Reset()
+        {
+            Health = 10;
+            currentRealodedTime = 0;
+            currentVerticalSpeed = 0;
+            currnetFrameNumber = 0;
+        }
+
         public override void Update()
         {
             base.Update();
@@ -35,11 +47,11 @@
             currentVerticalSpeed += acceleration;
         }
 
-        public void Fire(List<GameObject> gameObjects)
+        public void Fire()
         {
             if (currentRealodedTime >= reloadedTime)
             {
-                gameObjects.Add(new PlayerBullet(X + size / 2, Y));
+                Create(typeof(PlayerBullet), X + size / 2, Y);
                 currentRealodedTime = 0;
             }
         }
