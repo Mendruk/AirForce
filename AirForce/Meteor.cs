@@ -1,37 +1,38 @@
-﻿namespace AirForce
+﻿namespace AirForce;
+
+public class Meteor : GameObject
 {
-    public class Meteor : GameObject
+    public Meteor()
     {
-        public Meteor(int x, int y)
-        {
-            Tag = CollisionTags.Meteor;
-            X = x;
-            Y = y;
-            sprite = Resource.asteroid;
-            size = sprite.Height;
-            frameNumber = 4;
-            CalculateFramesRectangles();
-            Pull.Enqueue(this);
-            GameObjects.Add(this);
+        Tag = CollisionTags.Meteor;
+        Sprite = Resource.asteroid;
+        FrameNumber = 1;
+        Size = Sprite.Height;
 
-            horizontalSpeed = -15;
-            maxVerticalSpeed = 15 ;
-            acceleration = 3;
+        CalculateFramesRectangles();
+        Pull.Enqueue(this);
+        GameObjects.Add(this);
 
-            Reset();
-        }
-        protected override void Reset()
-        {
-            Health = 10;
-            currentVerticalSpeed = 3;
-            currnetFrameNumber = 0;
-        }
+        HorizontalSpeed = -10;
+        MaxVerticalSpeed = 10;
+        Acceleration = 2;
 
-        public override void Update()
-        {
-            base.Update();
+        Reset();
+    }
 
-            currentVerticalSpeed += acceleration;
-        }
+    public sealed override void Reset()
+    {
+        int randomNumber = Random.Next(4, 8);
+        Size = Sprite.Height * randomNumber / 8;
+        Health = randomNumber;
+        CurrentVerticalSpeed = 3;
+        CurrentFrameNumber = 0;
+    }
+
+    public override void Update()
+    {
+        base.Update();
+
+        CurrentVerticalSpeed += Acceleration;
     }
 }

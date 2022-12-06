@@ -1,8 +1,7 @@
-﻿namespace AirForce
+﻿namespace AirForce;
+
+public enum Directions
 {
-    public enum Directions
-    {
-        Up,
-        Down
-    }
+    Up,
+    Down
 }

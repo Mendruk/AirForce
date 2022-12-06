@@ -1,61 +1,65 @@
-﻿namespace AirForce
+﻿namespace AirForce;
+
+public class PlayerShip : GameObject
 {
-    public class PlayerShip : GameObject
+    private readonly int startedX;
+    private readonly int startedY;
+
+    public PlayerShip(int startedX, int startedY)
+    {       
+        this.startedX = startedX;
+        this.startedY = startedY;
+
+        Tag = CollisionTags.Player;
+        Sprite = Resource.player_ship;
+        FrameNumber = 3;
+        Size = Sprite.Height;
+
+        CalculateFramesRectangles();
+        Pull.Enqueue(this);
+        GameObjects.Add(this);
+
+        MaxVerticalSpeed = 12;
+        Acceleration = 4;
+        ReloadedTime = 10;
+
+        Reset();
+    }
+
+    public sealed override void Reset()
     {
-        public event EventHandler PlayerShipDestroyed = delegate { };
+        X = startedX;
+        Y = startedY;
+        Health = 10;
+        CurrentReloadedTime = 0;
+        CurrentVerticalSpeed = 0;
+        CurrentFrameNumber = 0;
+    }
 
-        public PlayerShip(int x, int y)
-        {
-            Tag = CollisionTags.Player;
-            X = x;
-            Y = y;
-            sprite = Resource.player_ship;
-            size = sprite.Height;
-            frameNumber = 3;
-            CalculateFramesRectangles();
-            Pull.Enqueue(this);
-            GameObjects.Add(this);
+    public override void Update()
+    {
+        base.Update();
 
-            maxVerticalSpeed = 12;
-            acceleration = 4;
-            reloadedTime = 10;
+        if (CurrentReloadedTime < ReloadedTime)
+            CurrentReloadedTime++;
+    }
 
-            Reset();
-        }
+    public void MoveUp()
+    {
+        CurrentVerticalSpeed -= Acceleration;
+    }
 
-        protected override void Reset()
-        {
-            Health = 10;
-            currentRealodedTime = 0;
-            currentVerticalSpeed = 0;
-            currnetFrameNumber = 0;
-        }
+    public void MoveDown()
+    {
+        CurrentVerticalSpeed += Acceleration;
+    }
 
-        public override void Update()
-        {
-            base.Update();
+    public override void Fire()
+    {
+        if (CurrentReloadedTime < ReloadedTime)
+            return;
 
-            if (currentRealodedTime < reloadedTime)
-                currentRealodedTime++;
-        }
-
-        public void MoveUp()
-        {
-            currentVerticalSpeed -= acceleration;
-        }
-
-        public void MoveDown()
-        {
-            currentVerticalSpeed += acceleration;
-        }
-
-        public override void Fire()
-        {
-            if (currentRealodedTime >= reloadedTime)
-            {
-                Create(typeof(PlayerBullet), X + size / 2, Y);
-                currentRealodedTime = 0;
-            }
-        }
+        Create(typeof(PlayerBullet), X + Size / 2, Y);
+        CurrentReloadedTime = 0;
     }
 }

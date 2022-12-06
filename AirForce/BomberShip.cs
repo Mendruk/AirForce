@@ -1,45 +1,41 @@
-﻿namespace AirForce
+﻿namespace AirForce;
+
+public class BomberShip : GameObject
 {
-    public class BomberShip : GameObject
+    public BomberShip()
     {
-        public BomberShip(int x, int y)
-        {
-            X = x;
-            Y = y;
-            Tag = CollisionTags.Enemy;
-            frameNumber = 2;
-            sprite = Resource.bomber_ship;
-            size = sprite.Height;
-            CalculateFramesRectangles();
-            Pull.Enqueue(this);
-            GameObjects.Add(this);
+        Tag = CollisionTags.Enemy;
+        Sprite = Resource.bomber_ship;
+        FrameNumber = 2;
+        Size = Sprite.Height;
 
-            //
-            horizontalSpeed = Game.Random.Next(-6, -4);
-            maxVerticalSpeed = 5;
-            currentVerticalSpeed = 1;
-            acceleration = 2;
+        CalculateFramesRectangles();
+        Pull.Enqueue(this);
+        GameObjects.Add(this);
 
-            canFire = true;
-            reloadedTime = 20;
+        MaxVerticalSpeed = 5;
+        CurrentVerticalSpeed = 1;
+        Acceleration = 2;
 
-            Reset();
-        }
+        CanFire = true;
+        ReloadedTime = 20;
 
-        protected override void Reset()
-        {
-            Health = 4;
-            currentRealodedTime = 0;
-            currnetFrameNumber = 0;
-        }
-
-        public override void Update()
-        {
-            base.Update();
-
-            if (currentRealodedTime < reloadedTime)
-                currentRealodedTime++;
-        }
+        Reset();
     }
 
+    public sealed override void Reset()
+    {
+        Health = 3;
+        CurrentReloadedTime = 0;
+        CurrentFrameNumber = 0;
+        HorizontalSpeed = Random.Next(-6, -4);
+    }
+
+    public override void Update()
+    {
+        base.Update();
+
+        if (CurrentReloadedTime < ReloadedTime)
+            CurrentReloadedTime++;
+    }
 }

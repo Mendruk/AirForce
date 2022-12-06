@@ -1,41 +1,35 @@
-﻿namespace AirForce
+﻿namespace AirForce;
+
+public class Explosion : GameObject
 {
-    public class Explosion : GameObject
+    public Explosion()
     {
-        public Explosion(int x, int y)
-        {
-            Tag = CollisionTags.Effect;
-            X = x;
-            Y = y;
-            sprite = Resource.explosion;
-            frameNumber = 4;
-            size = sprite.Height;
-            
-            CalculateFramesRectangles();
-            Pull.Enqueue(this);
-            GameObjects.Add(this);
+        Tag = CollisionTags.Effect;
+        Sprite = Resource.explosion;
+        FrameNumber = 4;
+        Size = Sprite.Height;
 
-            Reset();
+        CalculateFramesRectangles();
+        Pull.Enqueue(this);
+        GameObjects.Add(this);
 
-        }
-        protected sealed override void Reset()
-        {
-            currentRealodedTime = 0;
-            currentVerticalSpeed = 0;
-            currnetFrameNumber = 0;
-        }
+        Reset();
+    }
 
-        protected override void ChangeAnimationFrame()
-        {
-            currnetFrameNumber++;
+   public sealed override void Reset()
+    {
+        CurrentFrameNumber = 0;//
+    }
+    public override void IsDestroyedIfTakeDamage(int damage, out bool isDestroy)
+    {
+        isDestroy = true;
+    }
 
-            if (currnetFrameNumber >= frameNumber)
-                Delete(this);
-        }
+    protected override void ChangeAnimationFrame()
+    {
+        CurrentFrameNumber++;
 
-        public override void IsDestroyedIfTakeDamage(int damage, out bool isDestroy)
-        {
-            isDestroy=true;
-        }
+        if (CurrentFrameNumber >= FrameNumber)
+            Delete(this);
     }
 }

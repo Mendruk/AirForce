@@ -1,36 +1,31 @@
-﻿namespace AirForce
+﻿namespace AirForce;
+
+public class ChaserShip : GameObject
 {
-    public class ChaserShip : GameObject
+    public ChaserShip()
     {
-        public ChaserShip(int x, int y)
-        {
-            Tag = CollisionTags.Enemy;
-            X = x;
-            Y = y;
-            Tag = CollisionTags.Enemy;
-            frameNumber = 3;
-            sprite = Resource.chaser_ship;
-            size = sprite.Height;
-            CalculateFramesRectangles();
-            Pull.Enqueue(this);
-            GameObjects.Add(this);
+        Tag = CollisionTags.Enemy;
+        Sprite = Resource.chaser_ship;
+        FrameNumber = 3;
+        Size = Sprite.Height;
 
-            horizontalSpeed = Game.Random.Next(-10,-5);
-            maxVerticalSpeed = 5;
-            currentVerticalSpeed = 1;
-            acceleration = 2;
+        CalculateFramesRectangles();
+        Pull.Enqueue(this);
+        GameObjects.Add(this);
 
-            canDodge = true;
+        CanDodge = true;
+        MaxVerticalSpeed = 5;
+        CurrentVerticalSpeed = 1;
+        Acceleration = 2;
 
-            Reset();
+        Reset();
+    }
 
-        }
-
-        protected override void Reset()
-        {
-            Health = 1;
-            currentVerticalSpeed = 0;
-            currnetFrameNumber = 0;
-        }
+    public sealed override void Reset()
+    {
+        Health = 1;
+        CurrentVerticalSpeed = 0;
+        CurrentFrameNumber = 0;
+        HorizontalSpeed = Random.Next(-10, -5);
     }
 }

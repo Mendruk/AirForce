@@ -1,38 +1,37 @@
-﻿namespace AirForce
+﻿namespace AirForce;
+
+public class Bird : GameObject
 {
-    public class Bird : GameObject
+    public Bird()
     {
-        public Bird(int x, int y)
-        {
-            Tag = CollisionTags.Bird;
-            X = x;
-            Y = y;
-            sprite = Resource.bird;
-            size = 50;
-            frameNumber = 12;
-            CalculateFramesRectangles();
-            Pull.Enqueue(this);
-            GameObjects.Add(this);
+        Tag = CollisionTags.Bird;
+        Sprite = Resource.bird;
+        FrameNumber = 12;
+        Size = 50;
 
-            horizontalSpeed = -10;
-            currentVerticalSpeed = 5;
-            maxVerticalSpeed = 8;
-            acceleration = 4;
+        CalculateFramesRectangles();
+        Pull.Enqueue(this);
+        GameObjects.Add(this);
 
-            Reset();
-        }
-        protected override void Reset()
-        {
-            Health = 1;
-            currentVerticalSpeed = -3;
-            currnetFrameNumber = 0;
-        }
+        CurrentVerticalSpeed = 5;
+        MaxVerticalSpeed = 8;
+        Acceleration = 4;
 
-        public override void Update()
-        {
-            base.Update();
+        Reset();
+    }
 
-            currentVerticalSpeed += Game.Random.Next(-acceleration, acceleration);
-        }
+    public sealed override void Reset()
+    {
+        Health = 1;
+        CurrentVerticalSpeed = -3;
+        CurrentFrameNumber = 0;
+        HorizontalSpeed = -Random.Next(5, 10);
+    }
+
+    public override void Update()
+    {
+        base.Update();
+
+        CurrentVerticalSpeed += Game.Random.Next(-Acceleration, Acceleration);
     }
 }
