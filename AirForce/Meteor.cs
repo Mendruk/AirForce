@@ -15,7 +15,7 @@
             GameObjects.Add(this);
 
             horizontalSpeed = -15;
-            maxVerticalSpeed = 10 ;
+            maxVerticalSpeed = 15 ;
             acceleration = 3;
 
             Reset();

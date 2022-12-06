@@ -6,7 +6,6 @@ public enum CollisionTags
     PlayerBullet,
     Enemy,
     EnemyBullet,
-    Ground,
     Meteor,
     Bird,
     Effect

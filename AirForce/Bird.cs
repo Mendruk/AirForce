@@ -8,8 +8,8 @@
             X = x;
             Y = y;
             sprite = Resource.bird;
-            size = 75;
-            frameNumber = 20;
+            size = 50;
+            frameNumber = 12;
             CalculateFramesRectangles();
             Pull.Enqueue(this);
             GameObjects.Add(this);

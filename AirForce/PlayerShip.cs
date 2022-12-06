@@ -2,6 +2,8 @@
 {
     public class PlayerShip : GameObject
     {
+        public event EventHandler PlayerShipDestroyed = delegate { };
+
         public PlayerShip(int x, int y)
         {
             Tag = CollisionTags.Player;
@@ -47,7 +49,7 @@
             currentVerticalSpeed += acceleration;
         }
 
-        public void Fire()
+        public override void Fire()
         {
             if (currentRealodedTime >= reloadedTime)
             {

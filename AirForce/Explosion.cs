@@ -18,7 +18,7 @@
             Reset();
 
         }
-        protected override void Reset()
+        protected sealed override void Reset()
         {
             currentRealodedTime = 0;
             currentVerticalSpeed = 0;
@@ -30,11 +30,12 @@
             currnetFrameNumber++;
 
             if (currnetFrameNumber >= frameNumber)
-                Delite(this);
+                Delete(this);
         }
 
-        public override void TakeDamage(int damage)
+        public override void IsDestroyedIfTakeDamage(int damage, out bool isDestroy)
         {
+            isDestroy=true;
         }
     }
 }

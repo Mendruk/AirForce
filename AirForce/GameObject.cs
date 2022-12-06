@@ -25,16 +25,16 @@
         public int size;
 
         protected int frameNumber = 1;
-        protected int  currnetFrameNumber;
+        protected int currnetFrameNumber;
         protected List<Rectangle> frameRectangles;
 
+        /////////////////////////////////////TODO////////////////////////////////////////
         public static GameObject Create(Type type, int x, int y)
         {
-            GameObject obj;
-
             while (true)
             {
-                obj = Pull.Dequeue();
+                GameObject obj = Pull.Dequeue();
+
                 if (obj.GetType() == type)
                 {
                     obj.isEnable = true;
@@ -48,14 +48,12 @@
             }
         }
 
-        //todo
         public static GameObject Create(Type type, int x, int y, int size)
         {
-            GameObject obj;
-            //TODO
             while (true)
             {
-                obj = Pull.Dequeue();
+                GameObject obj = Pull.Dequeue();
+
                 if (obj.GetType() == type)
                 {
                     obj.isEnable = true;
@@ -69,8 +67,9 @@
                 Pull.Enqueue(obj);
             }
         }
+        /////////////////////////////////////////////////////////////////////////////
 
-        public static void Delite(GameObject gameObject)
+        public static void Delete(GameObject gameObject)
         {
             gameObject.isEnable = false;
             Pull.Enqueue(gameObject);
@@ -87,8 +86,6 @@
 
         public virtual void Update()
         {
-            //ChangeAnimationFrame();
-
             Move();
         }
 
@@ -148,29 +145,32 @@
                 case Directions.Down:
                     currentVerticalSpeed -= acceleration;
                     break;
-                default://todo
-                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
             }
         }
 
-        //todo
         public virtual void Fire()
         {
-            if (currentRealodedTime >= reloadedTime)
-            {
-                Create(typeof(EnemyBullet), X, Y);
-                currentRealodedTime = 0;
-            }
+            if (currentRealodedTime < reloadedTime) 
+                return;
+
+            Create(typeof(EnemyBullet), X, Y);
+            currentRealodedTime = 0;
         }
 
-        public virtual void TakeDamage(int damage)
+        public virtual void IsDestroyedIfTakeDamage(int damage, out bool isDestroyed)
         {
             Health -= damage;
-            if (Health <= 0)
-            {
-                Delite(this);
-                Create(typeof(Explosion), X, Y, size);
-            }
+            isDestroyed = false;
+
+            if (Health > 0)
+                return;
+
+            isDestroyed=true;
+            Delete(this);
+            Create(typeof(Explosion), X, Y, size);
         }
 
         protected abstract void Reset();
