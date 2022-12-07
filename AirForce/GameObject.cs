@@ -1,4 +1,6 @@
-﻿namespace AirForce;
+﻿using System.Reflection.Metadata.Ecma335;
+
+namespace AirForce;
 
 public abstract class GameObject
 {
@@ -162,18 +164,16 @@ public abstract class GameObject
         CurrentReloadedTime = 0;
     }
 
-    //todo try rename
-    public virtual void IsDestroyedIfTakeDamage(int damage, out bool isDestroyed)
+    public virtual bool TryDestroyByDamage(int damage)
     {
         Health -= damage;
-        isDestroyed = false;
 
         if (Health > 0)
-            return;
+            return false;
 
-        isDestroyed = true;
         Delete(this);
         Create(typeof(Explosion), X, Y, Size);
+        return true;
     }
 
     public abstract void Reset();

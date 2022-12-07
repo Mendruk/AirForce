@@ -18,11 +18,12 @@ public class Explosion : GameObject
 
    public sealed override void Reset()
     {
-        CurrentFrameNumber = 0;//
+        CurrentFrameNumber = 0;
     }
-    public override void IsDestroyedIfTakeDamage(int damage, out bool isDestroy)
+
+    public override bool TryDestroyByDamage(int damage)
     {
-        isDestroy = true;
+        return true;
     }
 
     protected override void ChangeAnimationFrame()

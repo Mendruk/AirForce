@@ -14,6 +14,7 @@ public class ChaserShip : GameObject
         GameObjects.Add(this);
 
         CanDodge = true;
+
         MaxVerticalSpeed = 5;
         CurrentVerticalSpeed = 1;
         Acceleration = 2;

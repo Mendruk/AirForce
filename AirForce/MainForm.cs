@@ -50,7 +50,7 @@ public partial class MainForm : Form
 
     private void MainForm_Paint(object sender, PaintEventArgs e)
     {
-        e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
+        //e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
 
         e.Graphics.FillRectangle(gradientBrush, 0, 0, Width, Height);
 
