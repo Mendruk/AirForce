@@ -2,6 +2,11 @@
 
 public class BomberShip : GameObject, IShootable
 {
+    //IShootable
+    private readonly Type bulletType = typeof(EnemyBullet);
+    private readonly int reloadedTime = 20;
+    private int currentReloadedTime;
+
     public BomberShip() : base(Resource.bomber_ship)
     {
         Type = GameObjectType.Enemy;
@@ -9,11 +14,6 @@ public class BomberShip : GameObject, IShootable
 
         maxHealth = Health = 3;
     }
-
-    //IShootable
-    private readonly Type bulletType = typeof(EnemyBullet);
-    private readonly int reloadedTime = 20;
-    private int currentReloadedTime;
 
     public void UpdateReloadingTime()
     {

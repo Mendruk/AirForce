@@ -9,7 +9,6 @@ public class Explosion : GameObject
 
     protected override void ChangeAnimationFrame()
     {
-
         CurrentFrameNumber += 1;
 
         if (CurrentFrameNumber >= FrameNumber)

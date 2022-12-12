@@ -2,8 +2,17 @@
 
 public class PlayerShip : GameObject, IShootable, IDodgeble
 {
+    //IShootable
+    private readonly Type bulletType = typeof(PlayerBullet);
+    private readonly int maxVerticalSpeed = 10;
+    private readonly int reloadedTime = 10;
     private readonly int startedX;
     private readonly int startedY;
+
+    //IDodgeble
+    private readonly int verticalAcceleration = 3;
+    private int currentReloadedTime;
+    private int currentVerticalSpeed;
 
     public PlayerShip(int startedX, int startedY) : base(Resource.player_ship)
     {
@@ -14,18 +23,6 @@ public class PlayerShip : GameObject, IShootable, IDodgeble
 
         maxHealth = Health = 10;
     }
-    public override void Reset()
-    {
-        base.Reset();
-
-        X = startedX;
-        Y = startedY;
-    }
-
-    //IDodgeble
-    private readonly int verticalAcceleration = 3;
-    private readonly int maxVerticalSpeed = 10;
-    private int currentVerticalSpeed;
 
     public void DodgeUp()
     {
@@ -57,11 +54,6 @@ public class PlayerShip : GameObject, IShootable, IDodgeble
             Y = Size / 2;
     }
 
-    //IShootable
-    private readonly Type bulletType = typeof(PlayerBullet);
-    private readonly int reloadedTime = 10;
-    private int currentReloadedTime;
-
     public void UpdateReloadingTime()
     {
         if (currentReloadedTime < reloadedTime)
@@ -75,5 +67,13 @@ public class PlayerShip : GameObject, IShootable, IDodgeble
 
         currentReloadedTime = 0;
         creationAction(bulletType, X + Size / 2, Y);
+    }
+
+    public override void Reset()
+    {
+        base.Reset();
+
+        X = startedX;
+        Y = startedY;
     }
 }

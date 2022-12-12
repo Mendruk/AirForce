@@ -6,7 +6,7 @@ public class Bird : GameObject
     {
         Type = GameObjectType.Bird;
         Size = 50;
-        ConstHorizontalSpeed = random.Next(-5,-3);
+        ConstHorizontalSpeed = random.Next(-5, -3);
 
         maxHealth = Health = 1;
     }

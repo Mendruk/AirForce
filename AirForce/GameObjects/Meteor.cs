@@ -6,10 +6,10 @@ public sealed class Meteor : GameObject
     {
         Type = GameObjectType.Meteor;
 
-        ConstHorizontalSpeed = random.Next(-10,-5);
-        ConstVerticalSpeed = random.Next(5,10);
+        ConstHorizontalSpeed = random.Next(-10, -5);
+        ConstVerticalSpeed = random.Next(5, 10);
 
-        maxHealth = Health = random.Next(4,8);
+        maxHealth = Health = random.Next(4, 8);
         Size = Size * maxHealth / 8;
     }
 }

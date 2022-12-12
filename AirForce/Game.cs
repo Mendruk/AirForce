@@ -1,25 +1,23 @@
-﻿using AirForce;
-using System.Drawing.Drawing2D;
+﻿using System.Drawing.Drawing2D;
+using AirForce;
+using AirForce.GameObjects;
 
 public class Game
-{
-    private readonly Font font = new(FontFamily.GenericSansSerif, 20, FontStyle.Bold);
-    private readonly LinearGradientBrush backgroundGradientBrush;
-    private readonly LinearGradientBrush groundGradientBrush;
-
-    public bool IsMoveUp, IsMoveDown, IsFire;
+{   
     public static Random Random = new();
+    public bool IsMoveUp, IsMoveDown, IsFire;
+
     private const int MaxEnemyNumber = 20;
-
-    private readonly List<GameObject> gameObjects = new();
-    private int currentTimeToCreateEnemy;
-
-    private readonly int gameFieldWidth;
-    private readonly int gameFieldHeight;
-
-    private readonly PlayerShip playerShip;
+    private readonly LinearGradientBrush backgroundGradientBrush;
     private readonly CollisionManager collisionManager;
+    private readonly Font font = new(FontFamily.GenericSansSerif, 20, FontStyle.Bold);
+    private readonly int gameFieldHeight;
+    private readonly int gameFieldWidth;
+    private readonly List<GameObject> gameObjects = new();
     private readonly Rectangle ground;
+    private readonly LinearGradientBrush groundGradientBrush;
+    private readonly PlayerShip playerShip;
+    private int currentTimeToCreateEnemy;
 
     public Game(int gameFieldWidth, int gameFieldHeight)
     {
@@ -57,6 +55,10 @@ public class Game
             gameObjects.Add(new Bird());
         }
 
+        for (int i = 0; i < 50; i++)
+            gameObjects.Add(new Star(Random.Next(0, gameFieldWidth), Random.Next(0, ground.Y)));
+
+
         collisionManager = new CollisionManager(gameObjects);
     }
 
@@ -80,19 +82,27 @@ public class Game
 
             gameObject.Move();
 
-            if (gameObject.X < 0 || gameObject.X > gameFieldWidth)
-                gameObject.IsEnable = false;
+            if (gameObject.X < 0 ||
+                gameObject.X > gameFieldWidth)
+            {
+                if (gameObject.Type == GameObjectType.Effect)
+                    gameObject.X = gameFieldWidth;
+                else
+                    gameObject.IsEnable = false;
+            }
 
-            if (gameObject.Y + gameObject.Size / 2 >= ground.Y && gameObject.Type != GameObjectType.Bird)
+
+            if (gameObject.Y + gameObject.Size / 2 >= ground.Y &&
+                gameObject.Type != GameObjectType.Bird)
                 TryDestroyByDamage(gameObject.Health, gameObject);
 
             if (gameObject is IDodgeble movable)
             {
                 DodgeDirection direction;
 
-                foreach (GameObject bullet in gameObjects.Where(gameObject => gameObject.Type == GameObjectType.PlayerBullet).
-                             Where(bullet => bullet.IsEnable))
-                {
+                foreach (GameObject bullet in gameObjects
+                             .Where(gameObject => gameObject.Type == GameObjectType.PlayerBullet)
+                             .Where(bullet => bullet.IsEnable))
                     if (collisionManager.HasDodge(gameObject, bullet, out direction))
                     {
                         if (direction == DodgeDirection.Up)
@@ -101,7 +111,6 @@ public class Game
                             movable.DodgeDown();
                         break;
                     }
-                }
 
                 movable.UpdateDodge();
             }
@@ -128,7 +137,8 @@ public class Game
 
     private void PlayerAct()
     {
-        if (playerShip.Y + playerShip.Size / 2 >= ground.Y && playerShip.Type != GameObjectType.Bird)
+        if (playerShip.Y + playerShip.Size / 2 >= ground.Y &&
+            playerShip.Type != GameObjectType.Bird)
             TryDestroyByDamage(playerShip.Health, playerShip);
 
         playerShip.UpdateDodge();
@@ -160,24 +170,23 @@ public class Game
         graphics.FillRectangle(backgroundGradientBrush, 0, 0, gameFieldWidth, gameFieldHeight);
         graphics.FillRectangle(groundGradientBrush, ground);
 
-        int listCount = gameObjects.Count;
-        for (int i = 0; i < listCount; i++)
-        {
-            GameObject gameObject = gameObjects[i];
-
-            if (!gameObject.IsEnable)
-                continue;
-
+        foreach (GameObject gameObject in gameObjects.Where(gameObject => gameObject.IsEnable &&
+                                                                          gameObject.Type == GameObjectType.Effect))
             gameObject.Draw(graphics);
-        }
 
-        graphics.DrawString("Health: " + playerShip.Health, font, Brushes.CadetBlue, gameFieldWidth / 15, gameFieldHeight * 4 / 5);
+        foreach (GameObject gameObject in gameObjects.Where(gameObject => gameObject.IsEnable &&
+                                                                          gameObject.Type != GameObjectType.Effect))
+            gameObject.Draw(graphics);
+
+        graphics.DrawString("Health: " + playerShip.Health, font, Brushes.CadetBlue, gameFieldWidth / 15,
+            gameFieldHeight * 4 / 5);
         graphics.DrawString("Score: " + Score, font, Brushes.CadetBlue, gameFieldWidth / 5, gameFieldHeight * 4 / 5);
     }
 
     public void Restart()
     {
-        foreach (GameObject gameObject in gameObjects.Where(gameObject => gameObject.IsEnable))
+        foreach (GameObject gameObject in gameObjects.Where(gameObject => gameObject.IsEnable &&
+                                                                          gameObject.Type != GameObjectType.Effect))
             gameObject.IsEnable = false;
 
         playerShip.Reset();
@@ -219,10 +228,22 @@ public class Game
     private void Create(Type type, int x, int y)
     {
         GameObject? createdGameObject = gameObjects.FirstOrDefault(gameObject => !gameObject.IsEnable &&
-                                                                      gameObject.GetType() == type, null);
+            gameObject.GetType() == type, null);
         if (createdGameObject == null)
             return;
 
+        createdGameObject.IsEnable = true;
+        createdGameObject.X = x;
+        createdGameObject.Y = y;
+    }
+
+    private void Create(Type type, int x, int y, int size)
+    {
+        GameObject? createdGameObject = gameObjects.FirstOrDefault(gameObject => !gameObject.IsEnable &&
+            gameObject.GetType() == type, null);
+        if (createdGameObject == null)
+            return;
+        createdGameObject.Size = size;
         createdGameObject.IsEnable = true;
         createdGameObject.X = x;
         createdGameObject.Y = y;
@@ -237,7 +258,7 @@ public class Game
 
         gameObject.IsEnable = false;
         gameObject.Reset();
-        Create(typeof(Explosion), gameObject.X, gameObject.Y); 
+        Create(typeof(Explosion), gameObject.X, gameObject.Y, gameObject.Size);
 
         if (gameObject == playerShip)
             Defeat(this, EventArgs.Empty);

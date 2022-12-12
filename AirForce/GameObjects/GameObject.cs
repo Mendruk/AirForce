@@ -2,22 +2,20 @@
 
 public abstract class GameObject
 {
-    protected Random random = new();
-    public bool IsEnable;
-    public GameObjectType Type;
+    protected int CurrentFrameNumber;
+    protected int FrameNumber;
+
+    protected List<Rectangle> FrameRectangles;
     public int Health;
+    public bool IsEnable;
     protected int maxHealth;
+    protected Random random = new();
+    public int Size;
+    protected Bitmap Sprite;
+    public GameObjectType Type;
 
     public int X;
     public int Y;
-    public int Size;
-    public int ConstHorizontalSpeed { get; protected set; }
-    public virtual int ConstVerticalSpeed { get; protected set; }
-
-    protected List<Rectangle> FrameRectangles;
-    protected int CurrentFrameNumber;
-    protected Bitmap Sprite;
-    protected int FrameNumber;
 
     protected GameObject(Bitmap sprite)
     {
@@ -26,6 +24,9 @@ public abstract class GameObject
         Size = sprite.Height;
         FrameRectangles = EnumerateFramesRectangles().ToList();
     }
+
+    public int ConstHorizontalSpeed { get; protected set; }
+    public virtual int ConstVerticalSpeed { get; protected set; }
 
     public void Draw(Graphics graphics)
     {

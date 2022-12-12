@@ -8,5 +8,5 @@ public enum GameObjectType
     EnemyBullet,
     Meteor,
     Bird,
-    Effect,
+    Effect
 }

@@ -7,32 +7,32 @@ public class CollisionManager
         {
             GameObjectType.Meteor,
             new[]
-            { GameObjectType.EnemyBullet, GameObjectType.Enemy, GameObjectType.Player, GameObjectType.PlayerBullet }
+                { GameObjectType.EnemyBullet, GameObjectType.Enemy, GameObjectType.Player, GameObjectType.PlayerBullet }
         },
         {
             GameObjectType.Player,
             new[]
-            { GameObjectType.Bird, GameObjectType.EnemyBullet, GameObjectType.Enemy, GameObjectType.Meteor }
+                { GameObjectType.Bird, GameObjectType.EnemyBullet, GameObjectType.Enemy, GameObjectType.Meteor }
         },
         {
             GameObjectType.PlayerBullet,
             new[]
-            { GameObjectType.Enemy, GameObjectType.Meteor}
+                { GameObjectType.Enemy, GameObjectType.Meteor }
         },
         {
             GameObjectType.Enemy,
             new[]
-            { GameObjectType.PlayerBullet, GameObjectType.Meteor}
+                { GameObjectType.PlayerBullet, GameObjectType.Meteor }
         },
         {
             GameObjectType.EnemyBullet,
             new[]
-            { GameObjectType.Player, GameObjectType.Meteor}
+                { GameObjectType.Player, GameObjectType.Meteor }
         },
         {
             GameObjectType.Bird,
             new[]
-            { GameObjectType.Player }
+                { GameObjectType.Player }
         }
     };
 
@@ -69,6 +69,7 @@ public class CollisionManager
                     collisionList.Add((gameObject1, gameObject2));
             }
         }
+
         return collisionList;
     }
 
@@ -100,7 +101,7 @@ public class CollisionManager
 
         return (int)Math.Sqrt(Math.Pow(gameObject1.X - gameObject2.X, 2) +
                               Math.Pow(gameObject1.Y - gameObject2.Y, 2)) <=
-               gameObject1.Size  + gameObject2.Size ;
+               gameObject1.Size + gameObject2.Size;
     }
 }
 

@@ -2,18 +2,19 @@
 
 public class ChaserShip : GameObject, IDodgeble
 {
-    public ChaserShip() : base(Resource.chaser_ship)
-    {
-        Type = GameObjectType.Enemy;
-        ConstHorizontalSpeed = random.Next(-12,-8);
-
-        maxHealth = Health = 1;
-    }
+    private readonly int maxVerticalSpeed = 10;
 
     //IDodgeble
     private readonly int verticalAcceleration = 3;
-    private readonly int maxVerticalSpeed = 10;
     private int currentVerticalSpeed;
+
+    public ChaserShip() : base(Resource.chaser_ship)
+    {
+        Type = GameObjectType.Enemy;
+        ConstHorizontalSpeed = random.Next(-12, -8);
+
+        maxHealth = Health = 1;
+    }
 
 
     public void DodgeUp()
@@ -45,5 +46,4 @@ public class ChaserShip : GameObject, IDodgeble
         if (Y < Size / 2)
             Y = Size / 2;
     }
-
 }
