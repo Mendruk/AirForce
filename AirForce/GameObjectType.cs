@@ -1,6 +1,6 @@
 ﻿namespace AirForce;
 
-public enum CollisionTags
+public enum GameObjectType
 {
     Player,
     PlayerBullet,
@@ -8,5 +8,5 @@ public enum CollisionTags
     EnemyBullet,
     Meteor,
     Bird,
-    Effect
+    Effect,
 }

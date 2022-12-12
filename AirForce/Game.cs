@@ -1,104 +1,118 @@
 ﻿using AirForce;
+using System.Drawing.Drawing2D;
 
 public class Game
 {
+    private readonly Font font = new(FontFamily.GenericSansSerif, 20, FontStyle.Bold);
+    private readonly LinearGradientBrush backgroundGradientBrush;
+    private readonly LinearGradientBrush groundGradientBrush;
+
     public bool IsMoveUp, IsMoveDown, IsFire;
     public static Random Random = new();
     private const int MaxEnemyNumber = 20;
 
-    private readonly Dictionary<CollisionTags, CollisionTags[]> collisions = new()
-    {
-        { CollisionTags.Meteor,       new[] { CollisionTags.EnemyBullet, CollisionTags.Enemy, CollisionTags.Player, CollisionTags.PlayerBullet } },
-        { CollisionTags.Player,       new[] { CollisionTags.Bird, CollisionTags.EnemyBullet, CollisionTags.Enemy, CollisionTags.Meteor } },
-        { CollisionTags.PlayerBullet, new[] { CollisionTags.Enemy, CollisionTags.Meteor } },
-        { CollisionTags.Enemy,        new[] { CollisionTags.PlayerBullet, CollisionTags.Meteor } },
-        { CollisionTags.EnemyBullet,  new[] { CollisionTags.Player, CollisionTags.Meteor } },
-        { CollisionTags.Bird,         new[] { CollisionTags.Player } }
-    };
-
+    private readonly List<GameObject> gameObjects = new();
     private int currentTimeToCreateEnemy;
 
     private readonly int gameFieldWidth;
     private readonly int gameFieldHeight;
 
-    private readonly Ground ground;
     private readonly PlayerShip playerShip;
+    private readonly CollisionManager collisionManager;
+    private readonly Rectangle ground;
 
     public Game(int gameFieldWidth, int gameFieldHeight)
     {
+        backgroundGradientBrush = new LinearGradientBrush(
+            new Point(0, 0),
+            new Point(0, gameFieldHeight),
+            Color.DarkSlateGray,
+            Color.CadetBlue);
+
+        ground = new Rectangle(0, gameFieldHeight * 4 / 5, gameFieldWidth, gameFieldHeight);
+
+        groundGradientBrush = new LinearGradientBrush(
+            new Point(0, ground.Y),
+            new Point(0, gameFieldHeight),
+            Color.DarkSlateGray,
+            Color.CadetBlue);
+
         this.gameFieldHeight = gameFieldHeight;
         this.gameFieldWidth = gameFieldWidth;
 
-        ground = new Ground(gameFieldWidth, gameFieldHeight);
-
-        int playerStartX = gameFieldWidth / 7;
-        int playerStartY = (gameFieldHeight - ground.Y) / 2;
+        int playerStartX = gameFieldWidth / 8;
+        int playerStartY = ground.Y / 2;
 
         playerShip = new PlayerShip(playerStartX, playerStartY) { IsEnable = true };
+        gameObjects.Add(playerShip);
 
         for (int i = 0; i < MaxEnemyNumber; i++)
         {
-            new PlayerBullet();
-            new EnemyBullet();
-            new Explosion();
-            new ChaserShip();
-            new BomberShip();
-            new Meteor();
-            new Bird();
+            gameObjects.Add(new PlayerBullet());
+            gameObjects.Add(new EnemyBullet());
+            gameObjects.Add(new Explosion());
+            gameObjects.Add(new ChaserShip());
+            gameObjects.Add(new BomberShip());
+            gameObjects.Add(new Meteor());
+            gameObjects.Add(new Bird());
         }
+
+        collisionManager = new CollisionManager(gameObjects);
     }
 
     public int Score { get; private set; }
-    public int Health => playerShip.Health;
 
     public event EventHandler Defeat = delegate { };
 
     public void Update()
     {
-        int listCount = GameObject.GameObjects.Count;
+        foreach ((GameObject? gameObject1, GameObject? gameObject2) in collisionManager.Collision())
+            CollideGameObjects(gameObject1, gameObject2);
 
-        for (int i = 0; i < listCount; i++)
+        int listCount = gameObjects.Count;
+
+        for (int i = 1; i < listCount; i++)
         {
-            GameObject gameObject1 = GameObject.GameObjects[i];
+            GameObject gameObject = gameObjects[i];
 
-            if (!gameObject1.IsEnable)
+            if (!gameObject.IsEnable)
                 continue;
 
-            if (gameObject1.X < 0 || gameObject1.X > gameFieldWidth)
-                GameObject.Delete(gameObject1);
+            gameObject.Move();
 
-            if (gameObject1.Y > ground.Y - gameObject1.Size / 2 &&
-                gameObject1.Tag != CollisionTags.Bird)
+            if (gameObject.X < 0 || gameObject.X > gameFieldWidth)
+                gameObject.IsEnable = false;
+
+            if (gameObject.Y + gameObject.Size / 2 >= ground.Y && gameObject.Type != GameObjectType.Bird)
+                TryDestroyByDamage(gameObject.Health, gameObject);
+
+            if (gameObject is IDodgeble movable)
             {
-                if (gameObject1.TryDestroyByDamage(gameObject1.Health) &&
-                    gameObject1 == playerShip)
-                    Defeat(this, EventArgs.Empty);
+                DodgeDirection direction;
 
-                continue;
+                foreach (GameObject bullet in gameObjects.Where(gameObject => gameObject.Type == GameObjectType.PlayerBullet).
+                             Where(bullet => bullet.IsEnable))
+                {
+                    if (collisionManager.HasDodge(gameObject, bullet, out direction))
+                    {
+                        if (direction == DodgeDirection.Up)
+                            movable.DodgeUp();
+                        else if (direction == DodgeDirection.Down)
+                            movable.DodgeDown();
+                        break;
+                    }
+                }
+
+                movable.UpdateDodge();
             }
 
-            if (gameObject1.CanFire &&
-                gameObject1.Y < playerShip.Y + playerShip.Size &&
-                gameObject1.Y > playerShip.Y - playerShip.Size)
-                gameObject1.Fire();
-
-            for (int j = i + 1; j < listCount; j++)
+            if (gameObject is IShootable shootable)
             {
-                GameObject gameObject2 = GameObject.GameObjects[j];
+                if (collisionManager.HasShoot(gameObject, playerShip))
+                    shootable.Shoot(Create);
 
-                if (!gameObject2.IsEnable)
-                    continue;
-
-                if (gameObject1.CanDodge && gameObject2.Tag == CollisionTags.PlayerBullet &&
-                    gameObject1.DistanceToObject(gameObject2) < gameObject1.Size * 3)
-                    gameObject1.Dodge(gameObject1.Y <= gameObject2.Y ? Directions.Down : Directions.Up);
-
-                if (gameObject1.DistanceToObject(gameObject2) <= gameObject1.Size / 2 + gameObject2.Size / 2 &&
-                    HasCollision(gameObject1.Tag, gameObject2.Tag))
-                    CollideGameObjects(gameObject1, gameObject2);
+                shootable.UpdateReloadingTime();
             }
-
-            gameObject1.Update();
         }
 
         PlayerAct();
@@ -114,43 +128,57 @@ public class Game
 
     private void PlayerAct()
     {
+        if (playerShip.Y + playerShip.Size / 2 >= ground.Y && playerShip.Type != GameObjectType.Bird)
+            TryDestroyByDamage(playerShip.Health, playerShip);
+
+        playerShip.UpdateDodge();
+        playerShip.UpdateReloadingTime();
+
         if (IsMoveUp)
-            playerShip.MoveUp();
+            playerShip.DodgeUp();
 
         if (IsMoveDown)
-            playerShip.MoveDown();
+            playerShip.DodgeDown();
 
-        if (IsFire) playerShip.Fire();
-
+        if (IsFire)
+            playerShip.Shoot(Create);
     }
 
     private void CollideGameObjects(GameObject gameObject1, GameObject gameObject2)
     {
         int gameObject1Health = gameObject1.Health;
 
-        bool isDestroyedGameObject1 = gameObject1.TryDestroyByDamage(gameObject2.Health);
-        bool isDestroyedGameObject2 = gameObject2.TryDestroyByDamage(gameObject1Health);
-
-        if (isDestroyedGameObject1 && gameObject1 == playerShip)
-            Defeat(this, EventArgs.Empty);
-
-        if ((isDestroyedGameObject1 && gameObject1.Tag == CollisionTags.Enemy) ||
-            (isDestroyedGameObject2 && gameObject2.Tag == CollisionTags.Enemy))
+        if ((TryDestroyByDamage(gameObject2.Health, gameObject1)
+             && gameObject1.Type == GameObjectType.Enemy) ||
+            (TryDestroyByDamage(gameObject1Health, gameObject2)
+             && gameObject2.Type == GameObjectType.Enemy))
             Score++;
     }
 
     public void Draw(Graphics graphics)
     {
-        foreach (GameObject gameObject in GameObject.GameObjects.Where(gameObject => gameObject.IsEnable))
-            gameObject.Draw(graphics);
+        graphics.FillRectangle(backgroundGradientBrush, 0, 0, gameFieldWidth, gameFieldHeight);
+        graphics.FillRectangle(groundGradientBrush, ground);
 
-        ground.Draw(graphics);
+        int listCount = gameObjects.Count;
+        for (int i = 0; i < listCount; i++)
+        {
+            GameObject gameObject = gameObjects[i];
+
+            if (!gameObject.IsEnable)
+                continue;
+
+            gameObject.Draw(graphics);
+        }
+
+        graphics.DrawString("Health: " + playerShip.Health, font, Brushes.CadetBlue, gameFieldWidth / 15, gameFieldHeight * 4 / 5);
+        graphics.DrawString("Score: " + Score, font, Brushes.CadetBlue, gameFieldWidth / 5, gameFieldHeight * 4 / 5);
     }
 
     public void Restart()
     {
-        foreach (GameObject gameObject in GameObject.GameObjects.Where(gameObject => gameObject.IsEnable))
-            GameObject.Delete(gameObject);
+        foreach (GameObject gameObject in gameObjects.Where(gameObject => gameObject.IsEnable))
+            gameObject.IsEnable = false;
 
         playerShip.Reset();
         playerShip.IsEnable = true;
@@ -166,31 +194,54 @@ public class Game
         switch (randomNumber)
         {
             case 1:
-                GameObject.Create(typeof(Meteor), Random.Next(gameFieldWidth / 4, gameFieldWidth), 0);
+                Create(typeof(Meteor), Random.Next(gameFieldWidth / 4, gameFieldWidth), 0);
                 break;
             case 2:
             case 3:
-                GameObject.Create(typeof(BomberShip), gameFieldWidth, Random.Next(0, ground.Y));
+                Create(typeof(BomberShip), gameFieldWidth, Random.Next(80, ground.Y - 80));
                 break;
             case 4:
             case 5:
             case 6:
-                GameObject.Create(typeof(ChaserShip), gameFieldWidth, Random.Next(0, ground.Y));
+                Create(typeof(ChaserShip), gameFieldWidth, Random.Next(30, ground.Y - 30));
                 break;
             case 7:
             case 8:
             case 9:
             case 10:
-                GameObject.Create(typeof(Bird), gameFieldWidth, Random.Next(gameFieldHeight / 2, ground.Y));
+                Create(typeof(Bird), gameFieldWidth, Random.Next(gameFieldHeight / 2, ground.Y));
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(randomNumber), randomNumber, null);
         }
     }
 
-    private bool HasCollision(CollisionTags tag1, CollisionTags tag2)
+    private void Create(Type type, int x, int y)
     {
-        return collisions.TryGetValue(tag1, out CollisionTags[] tags) &&
-               tags.Any(tag => tag2 == tag);
+        GameObject? createdGameObject = gameObjects.FirstOrDefault(gameObject => !gameObject.IsEnable &&
+                                                                      gameObject.GetType() == type, null);
+        if (createdGameObject == null)
+            return;
+
+        createdGameObject.IsEnable = true;
+        createdGameObject.X = x;
+        createdGameObject.Y = y;
+    }
+
+    public bool TryDestroyByDamage(int damage, GameObject gameObject)
+    {
+        gameObject.Health -= damage;
+
+        if (gameObject.Health > 0)
+            return false;
+
+        gameObject.IsEnable = false;
+        gameObject.Reset();
+        Create(typeof(Explosion), gameObject.X, gameObject.Y); 
+
+        if (gameObject == playerShip)
+            Defeat(this, EventArgs.Empty);
+
+        return true;
     }
 }
