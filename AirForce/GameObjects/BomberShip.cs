@@ -2,7 +2,6 @@
 
 public class BomberShip : GameObject, IShootable
 {
-    //IShootable
     private readonly Type bulletType = typeof(EnemyBullet);
     private readonly int reloadedTime = 20;
     private int currentReloadedTime;
@@ -12,7 +11,7 @@ public class BomberShip : GameObject, IShootable
         Type = GameObjectType.Enemy;
         ConstHorizontalSpeed = random.Next(-8, -5);
 
-        maxHealth = Health = 3;
+        MaxHealth = Health = 3;
     }
 
     public void UpdateReloadingTime()

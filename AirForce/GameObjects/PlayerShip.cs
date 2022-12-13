@@ -1,15 +1,14 @@
 ﻿namespace AirForce;
 
 public class PlayerShip : GameObject, IShootable, IDodgeble
-{
-    //IShootable
-    private readonly Type bulletType = typeof(PlayerBullet);
-    private readonly int maxVerticalSpeed = 10;
-    private readonly int reloadedTime = 10;
+{   
     private readonly int startedX;
     private readonly int startedY;
 
-    //IDodgeble
+    private readonly Type bulletType = typeof(PlayerBullet);
+    private readonly int maxVerticalSpeed = 10;
+    private readonly int reloadedTime = 10;
+
     private readonly int verticalAcceleration = 3;
     private int currentReloadedTime;
     private int currentVerticalSpeed;
@@ -21,7 +20,7 @@ public class PlayerShip : GameObject, IShootable, IDodgeble
         X = this.startedX = startedX;
         Y = this.startedY = startedY;
 
-        maxHealth = Health = 10;
+        MaxHealth = Health = 10;
     }
 
     public void DodgeUp()

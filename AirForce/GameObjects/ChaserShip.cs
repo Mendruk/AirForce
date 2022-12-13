@@ -4,7 +4,6 @@ public class ChaserShip : GameObject, IDodgeble
 {
     private readonly int maxVerticalSpeed = 10;
 
-    //IDodgeble
     private readonly int verticalAcceleration = 3;
     private int currentVerticalSpeed;
 
@@ -13,9 +12,8 @@ public class ChaserShip : GameObject, IDodgeble
         Type = GameObjectType.Enemy;
         ConstHorizontalSpeed = random.Next(-12, -8);
 
-        maxHealth = Health = 1;
+        MaxHealth = Health = 1;
     }
-
 
     public void DodgeUp()
     {

@@ -6,23 +6,19 @@ public class CollisionManager
     {
         {
             GameObjectType.Meteor,
-            new[]
-                { GameObjectType.EnemyBullet, GameObjectType.Enemy, GameObjectType.Player, GameObjectType.PlayerBullet }
+            new[] { GameObjectType.EnemyBullet, GameObjectType.Enemy, GameObjectType.Player, GameObjectType.PlayerBullet }
         },
         {
             GameObjectType.Player,
-            new[]
-                { GameObjectType.Bird, GameObjectType.EnemyBullet, GameObjectType.Enemy, GameObjectType.Meteor }
+            new[] { GameObjectType.Bird, GameObjectType.EnemyBullet, GameObjectType.Enemy, GameObjectType.Meteor }
         },
         {
             GameObjectType.PlayerBullet,
-            new[]
-                { GameObjectType.Enemy, GameObjectType.Meteor }
+            new[] { GameObjectType.Enemy, GameObjectType.Meteor }
         },
         {
             GameObjectType.Enemy,
-            new[]
-                { GameObjectType.PlayerBullet, GameObjectType.Meteor }
+            new[] { GameObjectType.PlayerBullet, GameObjectType.Meteor }
         },
         {
             GameObjectType.EnemyBullet,
@@ -31,13 +27,11 @@ public class CollisionManager
         },
         {
             GameObjectType.Bird,
-            new[]
-                { GameObjectType.Player }
+            new[] { GameObjectType.Player }
         }
     };
 
     private readonly List<GameObject> gameObjects;
-
 
     public CollisionManager(List<GameObject> gameObjects)
     {
@@ -103,10 +97,4 @@ public class CollisionManager
                               Math.Pow(gameObject1.Y - gameObject2.Y, 2)) <=
                gameObject1.Size + gameObject2.Size;
     }
-}
-
-public enum DodgeDirection
-{
-    Up,
-    Down
 }

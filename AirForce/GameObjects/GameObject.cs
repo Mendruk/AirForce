@@ -2,20 +2,22 @@
 
 public abstract class GameObject
 {
+    protected Random random = new();
+
     protected int CurrentFrameNumber;
     protected int FrameNumber;
-
-    protected List<Rectangle> FrameRectangles;
-    public int Health;
-    public bool IsEnable;
-    protected int maxHealth;
-    protected Random random = new();
-    public int Size;
     protected Bitmap Sprite;
-    public GameObjectType Type;
+    protected List<Rectangle> FrameRectangles;
+
+    protected int MaxHealth;
+    public int Health;
+    public int Size;
 
     public int X;
     public int Y;
+
+    public bool IsEnable;
+    public GameObjectType Type;
 
     protected GameObject(Bitmap sprite)
     {
@@ -44,13 +46,6 @@ public abstract class GameObject
             CurrentFrameNumber = 0;
     }
 
-    private IEnumerable<Rectangle> EnumerateFramesRectangles()
-    {
-        for (int i = 0; i < FrameNumber; i++)
-            yield return new Rectangle(i * Sprite.Width / FrameNumber, 0,
-                Sprite.Width / FrameNumber, Sprite.Height);
-    }
-
     public void Move()
     {
         X += ConstHorizontalSpeed;
@@ -59,6 +54,13 @@ public abstract class GameObject
 
     public virtual void Reset()
     {
-        Health = maxHealth;
+        Health = MaxHealth;
+    }
+
+    private IEnumerable<Rectangle> EnumerateFramesRectangles()
+    {
+        for (int i = 0; i < FrameNumber; i++)
+            yield return new Rectangle(i * Sprite.Width / FrameNumber, 0,
+                Sprite.Width / FrameNumber, Sprite.Height);
     }
 }

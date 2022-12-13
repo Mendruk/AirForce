@@ -9,7 +9,7 @@ public sealed class Meteor : GameObject
         ConstHorizontalSpeed = random.Next(-10, -5);
         ConstVerticalSpeed = random.Next(5, 10);
 
-        maxHealth = Health = random.Next(4, 8);
-        Size = Size * maxHealth / 8;
+        MaxHealth = Health = random.Next(4, 8);
+        Size = Size * MaxHealth / 8;
     }
 }

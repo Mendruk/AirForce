@@ -1,23 +1,27 @@
-﻿using System.Drawing.Drawing2D;
-using AirForce;
+﻿using AirForce;
 using AirForce.GameObjects;
+using System.Drawing.Drawing2D;
 
 public class Game
-{   
-    public static Random Random = new();
-    public bool IsMoveUp, IsMoveDown, IsFire;
-
+{
     private const int MaxEnemyNumber = 20;
+    private int currentTimeToCreateEnemy;
+
+    private readonly Random random = new();
+
     private readonly LinearGradientBrush backgroundGradientBrush;
-    private readonly CollisionManager collisionManager;
+    private readonly LinearGradientBrush groundGradientBrush;
     private readonly Font font = new(FontFamily.GenericSansSerif, 20, FontStyle.Bold);
+
+    private readonly CollisionManager collisionManager;
+    private readonly List<GameObject> gameObjects = new();
+    private readonly PlayerShip playerShip;
+    private readonly Rectangle ground;
+
     private readonly int gameFieldHeight;
     private readonly int gameFieldWidth;
-    private readonly List<GameObject> gameObjects = new();
-    private readonly Rectangle ground;
-    private readonly LinearGradientBrush groundGradientBrush;
-    private readonly PlayerShip playerShip;
-    private int currentTimeToCreateEnemy;
+
+    public bool IsMoveUp, IsMoveDown, IsFire;
 
     public Game(int gameFieldWidth, int gameFieldHeight)
     {
@@ -56,8 +60,7 @@ public class Game
         }
 
         for (int i = 0; i < 50; i++)
-            gameObjects.Add(new Star(Random.Next(0, gameFieldWidth), Random.Next(0, ground.Y)));
-
+            gameObjects.Add(new Star(random.Next(0, gameFieldWidth), random.Next(0, ground.Y)));
 
         collisionManager = new CollisionManager(gameObjects);
     }
@@ -91,19 +94,16 @@ public class Game
                     gameObject.IsEnable = false;
             }
 
-
             if (gameObject.Y + gameObject.Size / 2 >= ground.Y &&
                 gameObject.Type != GameObjectType.Bird)
                 TryDestroyByDamage(gameObject.Health, gameObject);
 
             if (gameObject is IDodgeble movable)
             {
-                DodgeDirection direction;
-
                 foreach (GameObject bullet in gameObjects
                              .Where(gameObject => gameObject.Type == GameObjectType.PlayerBullet)
                              .Where(bullet => bullet.IsEnable))
-                    if (collisionManager.HasDodge(gameObject, bullet, out direction))
+                    if (collisionManager.HasDodge(gameObject, bullet, out DodgeDirection direction))
                     {
                         if (direction == DodgeDirection.Up)
                             movable.DodgeUp();
@@ -117,14 +117,15 @@ public class Game
 
             if (gameObject is IShootable shootable)
             {
-                if (collisionManager.HasShoot(gameObject, playerShip))
+                if (collisionManager.HasShoot(gameObject, playerShip) && playerShip.IsEnable)
                     shootable.Shoot(Create);
 
                 shootable.UpdateReloadingTime();
             }
         }
 
-        PlayerAct();
+        if(playerShip.IsEnable) 
+            PlayerAct();
 
         currentTimeToCreateEnemy++;
 
@@ -134,7 +135,7 @@ public class Game
         CreateEnemy();
         currentTimeToCreateEnemy = 0;
     }
-
+    //2//
     private void PlayerAct()
     {
         if (playerShip.Y + playerShip.Size / 2 >= ground.Y &&
@@ -143,6 +144,7 @@ public class Game
 
         playerShip.UpdateDodge();
         playerShip.UpdateReloadingTime();
+        //
 
         if (IsMoveUp)
             playerShip.DodgeUp();
@@ -198,33 +200,34 @@ public class Game
 
     private void CreateEnemy()
     {
-        int randomNumber = Random.Next(1, 10);
+        int randomNumber = random.Next(1, 10);
 
         switch (randomNumber)
         {
             case 1:
-                Create(typeof(Meteor), Random.Next(gameFieldWidth / 4, gameFieldWidth), 0);
+                Create(typeof(Meteor), random.Next(gameFieldWidth / 4, gameFieldWidth), 0);
                 break;
             case 2:
             case 3:
-                Create(typeof(BomberShip), gameFieldWidth, Random.Next(80, ground.Y - 80));
+                Create(typeof(BomberShip), gameFieldWidth, random.Next(80, ground.Y - 80));
                 break;
             case 4:
             case 5:
             case 6:
-                Create(typeof(ChaserShip), gameFieldWidth, Random.Next(30, ground.Y - 30));
+                Create(typeof(ChaserShip), gameFieldWidth, random.Next(30, ground.Y - 30));
                 break;
             case 7:
             case 8:
             case 9:
             case 10:
-                Create(typeof(Bird), gameFieldWidth, Random.Next(gameFieldHeight / 2, ground.Y));
+                Create(typeof(Bird), gameFieldWidth, random.Next(gameFieldHeight / 2, ground.Y));
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(randomNumber), randomNumber, null);
         }
     }
 
+    //1//
     private void Create(Type type, int x, int y)
     {
         GameObject? createdGameObject = gameObjects.FirstOrDefault(gameObject => !gameObject.IsEnable &&
@@ -248,6 +251,7 @@ public class Game
         createdGameObject.X = x;
         createdGameObject.Y = y;
     }
+    //
 
     public bool TryDestroyByDamage(int damage, GameObject gameObject)
     {
