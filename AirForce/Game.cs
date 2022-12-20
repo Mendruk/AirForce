@@ -87,7 +87,7 @@ public class Game
                 foreach (GameObject bullet in gameObjects)
                 {
                     if (bullet.Type != GameObjectType.PlayerBullet ||
-                    !HasDodge(gameObject, bullet, out DodgeDirection direction))
+                        !HasDodge(gameObject, bullet, out DodgeDirection direction))
                         continue;
 
                     if (direction == DodgeDirection.Up)
@@ -113,11 +113,11 @@ public class Game
 
         currentTimeToCreateEnemy++;
 
-        if (currentTimeToCreateEnemy < 30)
-            return;
-
-        CreateRandomEnemy();
-        currentTimeToCreateEnemy = 0;
+        if (currentTimeToCreateEnemy >= 30)
+        {
+            CreateRandomEnemy();
+            currentTimeToCreateEnemy = 0;
+        }
 
         gameObjects.AddRange(gameObjectsToAdd);
         gameObjectsToAdd.Clear();
