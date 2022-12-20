@@ -8,7 +8,7 @@ public class Bird : GameObject
         Size = 50;
         ConstHorizontalSpeed = random.Next(-5, -3);
 
-        MaxHealth = Health = 1;
+        Health = 1;
     }
 
     public override int ConstVerticalSpeed

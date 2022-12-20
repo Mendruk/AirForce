@@ -10,7 +10,7 @@ public class BomberShip : GameObject, IShootable
         Type = GameObjectType.Enemy;
         ConstHorizontalSpeed = random.Next(-8, -5);
 
-        MaxHealth = Health = 3;
+        Health = 3;
     }
 
     public void UpdateReloadingTime()

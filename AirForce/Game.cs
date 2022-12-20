@@ -3,7 +3,6 @@ using System.Drawing.Drawing2D;
 
 public class Game
 {
-    private const int MaxEnemyNumber = 20;
     private int currentTimeToCreateEnemy;
 
     private readonly Random random = new();
@@ -50,7 +49,7 @@ public class Game
         playerShip = new PlayerShip(playerStartX, playerStartY);
         gameObjects.Add(playerShip);
 
-        collisionManager = new CollisionManager(gameObjects);
+        collisionManager = new CollisionManager();
     }
 
     public int Score { get; private set; }
@@ -59,7 +58,7 @@ public class Game
 
     public void Update()
     {
-        foreach ((GameObject? gameObject1, GameObject? gameObject2) in collisionManager.Collision())
+        foreach ((GameObject? gameObject1, GameObject? gameObject2) in collisionManager.Collision(gameObjects))
             CollideGameObjects(gameObject1, gameObject2);
 
         int listCount = gameObjects.Count;
@@ -85,23 +84,25 @@ public class Game
 
             if (gameObject is IDodgeble movable)
             {
-                foreach (GameObject bullet in gameObjects
-                             .Where(gameObject => gameObject.Type == GameObjectType.PlayerBullet))
-                    if (collisionManager.HasDodge(gameObject, bullet, out DodgeDirection direction))
-                    {
-                        if (direction == DodgeDirection.Up)
-                            movable.DodgeUp();
-                        else if (direction == DodgeDirection.Down)
-                            movable.DodgeDown();
-                        break;
-                    }
+                foreach (GameObject bullet in gameObjects)
+                {
+                    if (bullet.Type != GameObjectType.PlayerBullet ||
+                    !HasDodge(gameObject, bullet, out DodgeDirection direction))
+                        continue;
+
+                    if (direction == DodgeDirection.Up)
+                        movable.DodgeUp();
+                    else if (direction == DodgeDirection.Down)
+                        movable.DodgeDown();
+                    break;
+                }
 
                 movable.UpdateDodge();
             }
 
             if (gameObject is IShootable shootable)
             {
-                if (collisionManager.HasShoot(gameObject, playerShip))
+                if (HasShoot(gameObject, playerShip))
                     shootable.Shoot(Create);
 
                 shootable.UpdateReloadingTime();
@@ -115,7 +116,7 @@ public class Game
         if (currentTimeToCreateEnemy < 30)
             return;
 
-        CreateEnemy();
+        CreateRandomEnemy();
         currentTimeToCreateEnemy = 0;
 
         gameObjects.AddRange(gameObjectsToAdd);
@@ -123,7 +124,7 @@ public class Game
 
         foreach (GameObject gameObjectToDelete in gameObjectsToDelete)
             gameObjects.Remove(gameObjectToDelete);
-        
+
         gameObjectsToDelete.Clear();
     }
 
@@ -181,7 +182,7 @@ public class Game
         Score = 0;
     }
 
-    private void CreateEnemy()
+    private void CreateRandomEnemy()
     {
         int randomNumber = random.Next(1, 10);
 
@@ -223,11 +224,29 @@ public class Game
             return false;
 
         gameObjectsToDelete.Add(gameObject);
-        //Create(typeof(Explosion), gameObject.X, gameObject.Y, gameObject.Size);
+        //Create(new Explosion( gameObject.X, gameObject.Y));
 
         //if (gameObject == playerShip)
         //    Defeat(this, EventArgs.Empty);
 
         return true;
+    }
+
+    private bool HasShoot(GameObject gameObject1, GameObject gameObject2)
+    {
+        return gameObject1.Y < gameObject2.Y + gameObject2.Size / 2 &&
+               gameObject1.Y > gameObject2.Y - gameObject2.Size / 2;
+    }
+
+    private bool HasDodge(GameObject gameObject1, GameObject gameObject2, out DodgeDirection direction)
+    {
+        if (gameObject1.Y < gameObject2.Y)
+            direction = DodgeDirection.Up;
+        else
+            direction = DodgeDirection.Down;
+
+        return (int)Math.Sqrt(Math.Pow(gameObject1.X - gameObject2.X, 2) +
+                              Math.Pow(gameObject1.Y - gameObject2.Y, 2)) <=
+               gameObject1.Size + gameObject2.Size;
     }
 }

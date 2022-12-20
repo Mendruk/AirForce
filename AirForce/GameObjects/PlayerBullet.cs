@@ -7,6 +7,6 @@ public class PlayerBullet : GameObject
         Type = GameObjectType.PlayerBullet;
         ConstHorizontalSpeed = 10;
 
-        MaxHealth = Health = 1;
+        Health = 1;
     }
 }

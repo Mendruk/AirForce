@@ -12,7 +12,7 @@ public class ChaserShip : GameObject, IDodgeble
         Type = GameObjectType.Enemy;
         ConstHorizontalSpeed = random.Next(-12, -8);
 
-        MaxHealth = Health = 1;
+        Health = 1;
     }
 
     public void DodgeUp()

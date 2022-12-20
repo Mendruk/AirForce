@@ -9,7 +9,6 @@ public abstract class GameObject
     protected Bitmap Sprite;
     protected List<Rectangle> FrameRectangles;
 
-    protected int MaxHealth;
     public int Health;
     public int Size;
 
@@ -52,11 +51,6 @@ public abstract class GameObject
     {
         X += ConstHorizontalSpeed;
         Y += ConstVerticalSpeed;
-    }
-
-    public virtual void Reset()
-    {
-        Health = MaxHealth;
     }
 
     private IEnumerable<Rectangle> EnumerateFramesRectangles()

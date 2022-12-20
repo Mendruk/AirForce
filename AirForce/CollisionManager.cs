@@ -31,14 +31,8 @@ public class CollisionManager
         }
     };
 
-    private readonly List<GameObject> gameObjects;
 
-    public CollisionManager(List<GameObject> gameObjects)
-    {
-        this.gameObjects = gameObjects;
-    }
-
-    public List<(GameObject gameObject1, GameObject gameObject2)> Collision()
+    public List<(GameObject gameObject1, GameObject gameObject2)> Collision(List<GameObject> gameObjects)
     {
         List<(GameObject gameObject1, GameObject gameObject2)> collisionList = new();
 
@@ -53,7 +47,7 @@ public class CollisionManager
                 GameObject gameObject2 = gameObjects[j];
 
                 if (HasTouch(gameObject1, gameObject2) &&
-                    HasCollision(gameObject1.Type, gameObject2.Type))
+                    HasCollisionBetweenTypes(gameObject1.Type, gameObject2.Type))
                     collisionList.Add((gameObject1, gameObject2));
             }
         }
@@ -61,7 +55,7 @@ public class CollisionManager
         return collisionList;
     }
 
-    private bool HasCollision(GameObjectType tag1, GameObjectType tag2)
+    private bool HasCollisionBetweenTypes(GameObjectType tag1, GameObjectType tag2)
     {
         return collisions.TryGetValue(tag1, out GameObjectType[] tags) &&
                tags.Any(tag => tag2 == tag);
@@ -72,23 +66,5 @@ public class CollisionManager
         return (int)Math.Sqrt(Math.Pow(gameObject1.X - gameObject2.X, 2) +
                               Math.Pow(gameObject1.Y - gameObject2.Y, 2)) <=
                gameObject1.Size / 2 + gameObject2.Size / 2;
-    }
-
-    public bool HasShoot(GameObject gameObject1, GameObject gameObject2)
-    {
-        return gameObject1.Y < gameObject2.Y + gameObject2.Size / 2 &&
-               gameObject1.Y > gameObject2.Y - gameObject2.Size / 2;
-    }
-
-    public bool HasDodge(GameObject gameObject1, GameObject gameObject2, out DodgeDirection direction)
-    {
-        if (gameObject1.Y < gameObject2.Y)
-            direction = DodgeDirection.Up;
-        else
-            direction = DodgeDirection.Down;
-
-        return (int)Math.Sqrt(Math.Pow(gameObject1.X - gameObject2.X, 2) +
-                              Math.Pow(gameObject1.Y - gameObject2.Y, 2)) <=
-               gameObject1.Size + gameObject2.Size;
     }
 }

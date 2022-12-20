@@ -7,6 +7,6 @@ public class EnemyBullet : GameObject
         Type = GameObjectType.EnemyBullet;
         ConstHorizontalSpeed = -15;
 
-        MaxHealth = Health = 1;
+        Health = 1;
     }
 }
