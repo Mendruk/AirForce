@@ -2,7 +2,7 @@
 
 public sealed class Meteor : GameObject
 {
-    public Meteor() : base(Resource.asteroid)
+    public Meteor(int x, int y) : base(x, y, Resource.asteroid)
     {
         Type = GameObjectType.Meteor;
 

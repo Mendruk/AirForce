@@ -1,11 +1,10 @@
 ﻿namespace AirForce;
 
 public class PlayerShip : GameObject, IShootable, IDodgeble
-{   
+{
     private readonly int startedX;
     private readonly int startedY;
 
-    private readonly Type bulletType = typeof(PlayerBullet);
     private readonly int maxVerticalSpeed = 10;
     private readonly int reloadedTime = 10;
 
@@ -13,7 +12,7 @@ public class PlayerShip : GameObject, IShootable, IDodgeble
     private int currentReloadedTime;
     private int currentVerticalSpeed;
 
-    public PlayerShip(int startedX, int startedY) : base(Resource.player_ship)
+    public PlayerShip(int startedX, int startedY) : base(startedX, startedY, Resource.player_ship)
     {
         Type = GameObjectType.Player;
 
@@ -59,14 +58,16 @@ public class PlayerShip : GameObject, IShootable, IDodgeble
             currentReloadedTime++;
     }
 
-    public void Shoot(Action<Type, int, int> creationAction)
+    public void Shoot(Action<GameObject> creationAction)
     {
         if (currentReloadedTime < reloadedTime)
             return;
 
         currentReloadedTime = 0;
-        creationAction(bulletType, X + Size / 2, Y);
+
+        creationAction(new PlayerBullet(X + Size / 2, Y));
     }
+
 
     public override void Reset()
     {

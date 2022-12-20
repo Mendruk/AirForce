@@ -2,7 +2,7 @@
 
 public class PlayerBullet : GameObject
 {
-    public PlayerBullet() : base(Resource.player_shot)
+    public PlayerBullet(int x, int y) : base(x, y, Resource.player_shot)
     {
         Type = GameObjectType.PlayerBullet;
         ConstHorizontalSpeed = 10;

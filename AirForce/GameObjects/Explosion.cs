@@ -2,7 +2,7 @@
 
 public class Explosion : GameObject
 {
-    public Explosion() : base(Resource.explosion)
+    public Explosion(int x, int y) : base(x, y, Resource.explosion)
     {
         Type = GameObjectType.Effect;
     }
@@ -14,7 +14,6 @@ public class Explosion : GameObject
         if (CurrentFrameNumber >= FrameNumber)
         {
             CurrentFrameNumber = 0;
-            IsEnable = false;
         }
     }
 }

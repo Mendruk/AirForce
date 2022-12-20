@@ -2,7 +2,7 @@
 
 public class Bird : GameObject
 {
-    public Bird() : base(Resource.bird)
+    public Bird(int x, int y) : base(x, y, Resource.bird)
     {
         Type = GameObjectType.Bird;
         Size = 50;

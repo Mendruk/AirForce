@@ -2,7 +2,7 @@
 
 public class EnemyBullet : GameObject
 {
-    public EnemyBullet() : base(Resource.enemy_shot)
+    public EnemyBullet(int x, int y) : base(x, y, Resource.enemy_shot)
     {
         Type = GameObjectType.EnemyBullet;
         ConstHorizontalSpeed = -15;

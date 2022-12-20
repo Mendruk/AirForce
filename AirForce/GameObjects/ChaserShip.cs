@@ -7,7 +7,7 @@ public class ChaserShip : GameObject, IDodgeble
     private readonly int verticalAcceleration = 3;
     private int currentVerticalSpeed;
 
-    public ChaserShip() : base(Resource.chaser_ship)
+    public ChaserShip(int x, int y) : base(x, y, Resource.chaser_ship)
     {
         Type = GameObjectType.Enemy;
         ConstHorizontalSpeed = random.Next(-12, -8);

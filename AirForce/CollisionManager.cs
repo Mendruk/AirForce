@@ -48,15 +48,9 @@ public class CollisionManager
         {
             GameObject gameObject1 = gameObjects[i];
 
-            if (!gameObject1.IsEnable)
-                continue;
-
             for (int j = i + 1; j < listCount; j++)
             {
                 GameObject gameObject2 = gameObjects[j];
-
-                if (!gameObject2.IsEnable)
-                    continue;
 
                 if (HasTouch(gameObject1, gameObject2) &&
                     HasCollision(gameObject1.Type, gameObject2.Type))

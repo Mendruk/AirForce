@@ -16,12 +16,14 @@ public abstract class GameObject
     public int X;
     public int Y;
 
-    public bool IsEnable;
     public GameObjectType Type;
 
-    protected GameObject(Bitmap sprite)
+    protected GameObject(int x, int y, Bitmap sprite)
     {
+        X = x;
+        Y = y;
         Sprite = sprite;
+
         FrameNumber = sprite.Width / sprite.Height;
         Size = sprite.Height;
         FrameRectangles = EnumerateFramesRectangles().ToList();
