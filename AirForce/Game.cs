@@ -245,8 +245,6 @@ public class Game
         else
             direction = DodgeDirection.Down;
 
-        return (int)Math.Sqrt(Math.Pow(gameObject1.X - gameObject2.X, 2) +
-                              Math.Pow(gameObject1.Y - gameObject2.Y, 2)) <=
-               gameObject1.Size + gameObject2.Size;
+        return gameObject1.GetDistanceTo(gameObject2)<= gameObject1.Size + gameObject2.Size;
     }
 }

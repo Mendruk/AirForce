@@ -63,8 +63,6 @@ public class CollisionManager
 
     private bool HasTouch(GameObject gameObject1, GameObject gameObject2)
     {
-        return (int)Math.Sqrt(Math.Pow(gameObject1.X - gameObject2.X, 2) +
-                              Math.Pow(gameObject1.Y - gameObject2.Y, 2)) <=
-               gameObject1.Size / 2 + gameObject2.Size / 2;
+        return gameObject1.GetDistanceTo(gameObject2) <= gameObject1.Size / 2 + gameObject2.Size / 2;
     }
 }

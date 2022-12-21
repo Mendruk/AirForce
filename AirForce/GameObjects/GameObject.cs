@@ -59,4 +59,10 @@ public abstract class GameObject
             yield return new Rectangle(i * Sprite.Width / FrameNumber, 0,
                 Sprite.Width / FrameNumber, Sprite.Height);
     }
+
+    public int GetDistanceTo(GameObject gameObject)
+    {
+        return (int)Math.Sqrt(Math.Pow(X - gameObject.X, 2) +
+                       Math.Pow(Y - gameObject.Y, 2));
+    }
 }
