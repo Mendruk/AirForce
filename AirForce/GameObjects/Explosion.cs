@@ -7,13 +7,13 @@ public class Explosion : GameObject
         Type = GameObjectType.Effect;
     }
 
-    protected override void ChangeAnimationFrame()
+    protected override void ChangeAnimationFrame(List<GameObject> gameObjectsToDelete)
     {
         CurrentFrameNumber += 1;
 
         if (CurrentFrameNumber >= FrameNumber)
         {
-            CurrentFrameNumber = 0;
+            gameObjectsToDelete.Add(this);
         }
     }
 }

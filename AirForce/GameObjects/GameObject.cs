@@ -35,11 +35,9 @@ public abstract class GameObject
     {
         Rectangle rectangle = new(X - Size / 2, Y - Size / 2, Size, Size);
         graphics.DrawImage(Sprite, rectangle, FrameRectangles[CurrentFrameNumber], GraphicsUnit.Pixel);
-
-        ChangeAnimationFrame();
     }
 
-    protected virtual void ChangeAnimationFrame()
+    protected virtual void ChangeAnimationFrame(List<GameObject> gameObjectsToDelete)
     {
         CurrentFrameNumber += 1;
 
@@ -53,6 +51,39 @@ public abstract class GameObject
         Y += ConstVerticalSpeed;
     }
 
+    public void Update(List<GameObject> gameObjects, List<GameObject> gameObjectsToDelete, Action<GameObject> creationAction)
+    {
+        Move();
+
+        ChangeAnimationFrame(gameObjectsToDelete);
+
+        if (this is IDodgeble dodgeble)
+        {
+            foreach (GameObject gameObject in gameObjects)
+            {
+                if (gameObject.Type != GameObjectType.PlayerBullet ||
+                    !HasDodge(this, gameObject, out DodgeDirection direction))
+                    continue;
+
+                if (direction == DodgeDirection.Up)
+                    dodgeble.DodgeUp();
+                else if (direction == DodgeDirection.Down)
+                    dodgeble.DodgeDown();
+                break;
+            }
+
+            dodgeble.UpdateDodge();
+        }
+
+        if (this is IShootable shootable)
+        {
+            if (HasShoot(this, gameObjects[0]))
+                shootable.Shoot(creationAction);
+
+            shootable.UpdateReloadingTime();
+        }
+    }
+
     private IEnumerable<Rectangle> EnumerateFramesRectangles()
     {
         for (int i = 0; i < FrameNumber; i++)
@@ -64,5 +95,21 @@ public abstract class GameObject
     {
         return (int)Math.Sqrt(Math.Pow(X - gameObject.X, 2) +
                        Math.Pow(Y - gameObject.Y, 2));
+    }
+
+    private bool HasShoot(GameObject gameObject1, GameObject gameObject2)
+    {
+        return gameObject1.Y < gameObject2.Y + gameObject2.Size / 2 &&
+               gameObject1.Y > gameObject2.Y - gameObject2.Size / 2;
+    }
+
+    private bool HasDodge(GameObject gameObject1, GameObject gameObject2, out DodgeDirection direction)
+    {
+        if (gameObject1.Y < gameObject2.Y)
+            direction = DodgeDirection.Up;
+        else
+            direction = DodgeDirection.Down;
+
+        return gameObject1.GetDistanceTo(gameObject2) <= gameObject1.Size + gameObject2.Size;
     }
 }

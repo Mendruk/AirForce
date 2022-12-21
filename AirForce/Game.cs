@@ -67,46 +67,21 @@ public class Game
         {
             GameObject gameObject = gameObjects[i];
 
-            gameObject.Move();
-
             if (gameObject.X < 0 ||
                 gameObject.X > gameFieldWidth)
             {
-                if (gameObject.Type == GameObjectType.Effect)
-                    gameObject.X = gameFieldWidth;
-                else
-                    gameObjectsToDelete.Add(gameObject);
+                //if (gameObject.Type == GameObjectType.Effect)
+                //    gameObject.X = gameFieldWidth;
+                //else
+                gameObjectsToDelete.Add(gameObject);
             }
 
             if (gameObject.Y + gameObject.Size / 2 >= ground.Y &&
-                gameObject.Type != GameObjectType.Bird)
+                gameObject.Type != GameObjectType.Bird &&
+                 gameObject.Type != GameObjectType.Effect)
                 TryDestroyByDamage(gameObject.Health, gameObject);
 
-            if (gameObject is IDodgeble movable)
-            {
-                foreach (GameObject bullet in gameObjects)
-                {
-                    if (bullet.Type != GameObjectType.PlayerBullet ||
-                        !HasDodge(gameObject, bullet, out DodgeDirection direction))
-                        continue;
-
-                    if (direction == DodgeDirection.Up)
-                        movable.DodgeUp();
-                    else if (direction == DodgeDirection.Down)
-                        movable.DodgeDown();
-                    break;
-                }
-
-                movable.UpdateDodge();
-            }
-
-            if (gameObject is IShootable shootable)
-            {
-                if (HasShoot(gameObject, playerShip))
-                    shootable.Shoot(Create);
-
-                shootable.UpdateReloadingTime();
-            }
+            gameObjects[i].Update(gameObjects, gameObjectsToDelete, Create);
         }
 
         PlayerAct();
@@ -223,28 +198,14 @@ public class Game
         if (gameObject.Health > 0)
             return false;
 
-        gameObjectsToDelete.Add(gameObject);
-        //Create(new Explosion( gameObject.X, gameObject.Y));
+        Create(new Explosion(gameObject.X, gameObject.Y));
 
-        //if (gameObject == playerShip)
-        //    Defeat(this, EventArgs.Empty);
+        //todo
+        if (gameObject.Type == GameObjectType.Player)
+            Defeat(this, EventArgs.Empty);
+        else
+            gameObjectsToDelete.Add(gameObject);
 
         return true;
-    }
-
-    private bool HasShoot(GameObject gameObject1, GameObject gameObject2)
-    {
-        return gameObject1.Y < gameObject2.Y + gameObject2.Size / 2 &&
-               gameObject1.Y > gameObject2.Y - gameObject2.Size / 2;
-    }
-
-    private bool HasDodge(GameObject gameObject1, GameObject gameObject2, out DodgeDirection direction)
-    {
-        if (gameObject1.Y < gameObject2.Y)
-            direction = DodgeDirection.Up;
-        else
-            direction = DodgeDirection.Down;
-
-        return gameObject1.GetDistanceTo(gameObject2)<= gameObject1.Size + gameObject2.Size;
     }
 }
