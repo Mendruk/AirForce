@@ -1,8 +1,8 @@
 ﻿namespace AirForce;
 
-public class CollisionManager
+public static class CollisionManager
 {
-    private readonly Dictionary<GameObjectType, GameObjectType[]> collisions = new()
+    private static readonly Dictionary<GameObjectType, GameObjectType[]> collisions = new()
     {
         {
             GameObjectType.Meteor,
@@ -31,8 +31,7 @@ public class CollisionManager
         }
     };
 
-
-    public List<(GameObject gameObject1, GameObject gameObject2)> Collision(List<GameObject> gameObjects)
+    public static List<(GameObject gameObject1, GameObject gameObject2)> Collision(List<GameObject> gameObjects)
     {
         List<(GameObject gameObject1, GameObject gameObject2)> collisionList = new();
 
@@ -55,13 +54,13 @@ public class CollisionManager
         return collisionList;
     }
 
-    private bool HasCollisionBetweenTypes(GameObjectType tag1, GameObjectType tag2)
+    private static bool HasCollisionBetweenTypes(GameObjectType tag1, GameObjectType tag2)
     {
         return collisions.TryGetValue(tag1, out GameObjectType[] tags) &&
                tags.Any(tag => tag2 == tag);
     }
 
-    private bool HasTouch(GameObject gameObject1, GameObject gameObject2)
+    private static bool HasTouch(GameObject gameObject1, GameObject gameObject2)
     {
         return gameObject1.GetDistanceTo(gameObject2) <= gameObject1.Size / 2 + gameObject2.Size / 2;
     }

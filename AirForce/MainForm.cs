@@ -15,7 +15,6 @@ public partial class MainForm : Form
                  ControlStyles.UserPaint, true);
 
         game = new Game(Width, Height);
-        game.Defeat += OnDefeat;
     }
 
     private void timer_Tick(object sender, EventArgs e)
@@ -60,9 +59,9 @@ public partial class MainForm : Form
             game.IsFire = false;
     }
 
-    private void OnDefeat(object? sender, EventArgs e)
-    {
-        MessageBox.Show("You LOSE!", "Defeat");
-        game.Restart();
-    }
+    //    private void OnDefeat(object? sender, EventArgs e)
+    //    {
+    //        MessageBox.Show("You LOSE!", "Defeat");
+    //        game.Restart();
+    //    }
 }
