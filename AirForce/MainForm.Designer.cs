@@ -49,8 +49,8 @@
             this.Name = "MainForm";
             this.Text = "AirForce";
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.MainForm_Paint);
-            //this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
-            //this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyUp);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyUp);
             this.ResumeLayout(false);
 
         }
