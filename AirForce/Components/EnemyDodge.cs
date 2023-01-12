@@ -2,14 +2,8 @@
 
 public class EnemyDodge : Dodge
 {
-    private readonly int maxVerticalSpeed;
-    private readonly int verticalAcceleration;
-    private int currentVerticalSpeed;
-
     public EnemyDodge(GameObject gameObject, int maxVerticalSpeed, int verticalAcceleration) : base(gameObject, maxVerticalSpeed, verticalAcceleration)
     {
-        this.maxVerticalSpeed = maxVerticalSpeed;
-        this.verticalAcceleration = verticalAcceleration;
     }
 
     public override void Update(List<GameObject> gameObjects)
@@ -26,10 +20,9 @@ public class EnemyDodge : Dodge
                 DodgeDown();
             break;
         }
-
-        base.UpdateDodge();
+        
+        UpdateDodge();
     }
-
 
     private bool HasDodge(GameObject gameObject1, GameObject gameObject2, out DodgeDirection direction)
     {

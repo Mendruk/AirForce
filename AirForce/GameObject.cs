@@ -4,52 +4,48 @@ namespace AirForce;
 
 public class GameObject
 {
-    public int X, Y;
+    private readonly Bitmap bitmap;
+    private readonly List<Rectangle> frameRectangles;
 
+    public readonly GameObjectType Type;
+    public readonly int FrameNumber;
     public int CurrentFrameNumber;
-    public int FrameNumber;
-    public Bitmap Bitmap;
-    public int Size;
-    public List<Rectangle> FrameRectangles;
-
-    public GameObjectType Type;
-    public int Health;
 
     public List<Component> Components;
+    public int Health;
+    public int Size;
+    public int X, Y;
 
     public GameObject(int x, int y, Bitmap bitmap, GameObjectType type, int health, List<Component> components)
     {
         X = x;
         Y = y;
-        Bitmap = bitmap;
+        this.bitmap = bitmap;
         Components = components;
         Type = type;
         Health = health;
 
-        FrameNumber = Bitmap.Width / Bitmap.Height;
-        Size = Bitmap.Height;
-        FrameRectangles = EnumerateFramesRectangles().ToList();
+        FrameNumber = this.bitmap.Width / this.bitmap.Height;
+        Size = this.bitmap.Height;
+        frameRectangles = EnumerateFramesRectangles().ToList();
     }
 
     private IEnumerable<Rectangle> EnumerateFramesRectangles()
     {
         for (int i = 0; i < FrameNumber; i++)
-            yield return new Rectangle(i * Bitmap.Width / FrameNumber, 0,
-                Bitmap.Width / FrameNumber, Bitmap.Height);
+            yield return new Rectangle(i * bitmap.Width / FrameNumber, 0,
+                bitmap.Width / FrameNumber, bitmap.Height);
     }
 
     public void Update(List<GameObject> gameObjects)
     {
-        foreach (Component component in Components)
-        {
-            component.Update(gameObjects);
-        }
+        foreach (Component component in Components) component.Update(gameObjects);
     }
 
     public void Draw(Graphics graphics)
     {
         Rectangle rectangle = new(X - Size / 2, Y - Size / 2, Size, Size);
-        graphics.DrawImage(Bitmap, rectangle, FrameRectangles[CurrentFrameNumber], GraphicsUnit.Pixel);
+        graphics.DrawImage(bitmap, rectangle, frameRectangles[CurrentFrameNumber], GraphicsUnit.Pixel);
     }
 
     public int GetDistanceTo(GameObject gameObject)

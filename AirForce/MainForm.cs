@@ -44,7 +44,15 @@ public partial class MainForm : Form
         }
 
         if (e.KeyCode == Keys.Space)
-            game.IsFire = true;
+        {
+            if (game.GameState == GameState.Play)
+                game.IsFire = true;
+            if (game.GameState == GameState.Defeat)
+            {
+                game.GameState = GameState.Play;
+                game.Restart();
+            }
+        }
     }
 
     private void MainForm_KeyUp(object sender, KeyEventArgs e)
@@ -58,10 +66,4 @@ public partial class MainForm : Form
         if (e.KeyCode == Keys.Space)
             game.IsFire = false;
     }
-
-    //    private void OnDefeat(object? sender, EventArgs e)
-    //    {
-    //        MessageBox.Show("You LOSE!", "Defeat");
-    //        game.Restart();
-    //    }
 }

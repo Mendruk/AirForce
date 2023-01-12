@@ -1,42 +1,47 @@
-﻿using AirForce;
+﻿using System.Drawing.Drawing2D;
+using AirForce;
 using AirForce.Components;
-using System.Drawing.Drawing2D;
-
 public class Game
-{
+{   
+    private readonly Random random = new();
+
     private readonly LinearGradientBrush backgroundGradientBrush;
+    private readonly LinearGradientBrush groundGradientBrush;
     private readonly Font font = new(FontFamily.GenericSansSerif, 20, FontStyle.Bold);
+    private static readonly StringFormat Format = new();
 
     private readonly int gameFieldHeight;
     private readonly int gameFieldWidth;
+
     private readonly List<GameObject> gameObjects = new();
     private readonly List<GameObject> gameObjectsToAdd = new();
     private readonly List<GameObject> gameObjectsToDelete = new();
-
     private readonly Rectangle ground;
-    private readonly LinearGradientBrush groundGradientBrush;
-    private readonly Dodge playerDodgeComponent;
-    private readonly Fire playerFireComponent;
-    private readonly GameObject playerShip;
 
-    private readonly Random random = new();
+    public GameState GameState = GameState.Play;
+
+    private Dodge playerDodgeComponent;
+    private Fire playerFireComponent;
+    private GameObject playerShip;
     private int currentTimeToCreateEnemy;
-    public bool IsMoveUp, IsMoveDown, IsFire;
 
+    public bool IsMoveUp, IsMoveDown, IsFire;
     public int Score;
 
     public Game(int gameFieldWidth, int gameFieldHeight)
     {
+        Format.Alignment = StringAlignment.Center;
+
         this.gameFieldWidth = gameFieldWidth;
         this.gameFieldHeight = gameFieldHeight;
+        ground = new Rectangle(0, gameFieldHeight * 4 / 5, gameFieldWidth, gameFieldHeight);
 
         backgroundGradientBrush = new LinearGradientBrush(
+
             new Point(0, 0),
             new Point(0, gameFieldHeight),
             Color.DarkSlateGray,
             Color.CadetBlue);
-
-        ground = new Rectangle(0, gameFieldHeight * 4 / 5, gameFieldWidth, gameFieldHeight);
 
         groundGradientBrush = new LinearGradientBrush(
             new Point(0, ground.Y),
@@ -44,13 +49,7 @@ public class Game
             Color.DarkSlateGray,
             Color.CadetBlue);
 
-        playerShip = new GameObject(100, 100, Resource.player_ship, GameObjectType.Player, 10, new List<Component>());
-        playerShip.Components.Add(new LoopAnimation(playerShip));
-        playerDodgeComponent = new Dodge(playerShip, 10, 3);
-        playerShip.Components.Add(playerDodgeComponent);
-        playerFireComponent = new Fire(playerShip, CreatePlayerBullet, 10);
-        playerShip.Components.Add(playerFireComponent);
-        gameObjects.Add(playerShip);
+        Restart();
     }
 
     public void Update()
@@ -58,7 +57,15 @@ public class Game
         foreach ((GameObject? gameObject1, GameObject? gameObject2) in CollisionManager.Collision(gameObjects))
             CollideGameObjects(gameObject1, gameObject2);
 
-        foreach (GameObject gameObject in gameObjects) gameObject.Update(gameObjects);
+        foreach (GameObject gameObject in gameObjects)
+        {
+            gameObject.Update(gameObjects);
+
+            if (gameObject.Y + gameObject.Size / 2 >= ground.Y 
+                && gameObject.Type != GameObjectType.Bird
+                && gameObject.Type != GameObjectType.Effect)
+                TryDestroyByDamage(gameObject.Health, gameObject);
+        }
 
         currentTimeToCreateEnemy++;
 
@@ -75,10 +82,6 @@ public class Game
             gameObjects.Remove(gameObjectToDelete);
 
         gameObjectsToDelete.Clear();
-
-        //if (playerShip.Y + playerShip.Size / 2 >= ground.Y &&
-        //    playerShip.Type != GameObjectType.Bird)
-        //    TryDestroyByDamage(playerShip.Health, playerShip);
 
         if (IsMoveUp)
             playerDodgeComponent.DodgeUp();
@@ -97,9 +100,19 @@ public class Game
 
         foreach (GameObject gameObject in gameObjects) gameObject.Draw(graphics);
 
-        graphics.DrawString("Health: " + playerShip.Health, font, Brushes.CadetBlue, gameFieldWidth / 15,
-            gameFieldHeight * 4 / 5);
-        graphics.DrawString("Score: " + Score, font, Brushes.CadetBlue, gameFieldWidth / 5, gameFieldHeight * 4 / 5);
+        switch (GameState )
+        {
+            case GameState.Play:        
+                graphics.DrawString("Health: " + playerShip.Health, font, Brushes.CadetBlue, gameFieldWidth / 15, gameFieldHeight * 4 / 5); 
+                graphics.DrawString("Score: " + Score, font, Brushes.CadetBlue, gameFieldWidth / 5, gameFieldHeight * 4 / 5);
+                break;
+            case GameState.Defeat:
+                graphics.DrawString("You Lose.\n You`re score " + Score +"\nPress SPACE to start new game", font, Brushes.CadetBlue, gameFieldWidth /2, gameFieldHeight /2,Format);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(GameState), GameState, null);
+        }
+
     }
 
     private void Create(GameObject gameObject)
@@ -119,7 +132,7 @@ public class Game
         switch (randomNumber)
         {
             case 1:
-                GameObject meteor = new(gameFieldWidth, random.Next(30, gameFieldHeight - 30), Resource.asteroid,
+                GameObject meteor = new(random.Next(0, gameFieldWidth / 2),0, Resource.asteroid,
                     GameObjectType.Meteor, 10, new List<Component>());
                 meteor.Components.Add(new MoveHorizontal(meteor, -5));
                 meteor.Components.Add(new MoveVertical(meteor, 5));
@@ -127,7 +140,7 @@ public class Game
                 break;
             case 2:
             case 3:
-                GameObject bomberShip = new(gameFieldWidth, random.Next(30, gameFieldHeight - 30), Resource.bomber_ship,
+                GameObject bomberShip = new(gameFieldWidth, random.Next(30, ground.Y), Resource.bomber_ship,
                     GameObjectType.Enemy, 3, new List<Component>());
                 bomberShip.Components.Add(new LoopAnimation(bomberShip));
                 bomberShip.Components.Add(new MoveHorizontal(bomberShip, -3));
@@ -137,7 +150,7 @@ public class Game
             case 4:
             case 5:
             case 6:
-                GameObject chaserShip = new(gameFieldWidth, random.Next(30, gameFieldHeight - 30), Resource.chaser_ship,
+                GameObject chaserShip = new(gameFieldWidth, random.Next(30, ground.Y), Resource.chaser_ship,
                     GameObjectType.Enemy, 1, new List<Component>());
                 chaserShip.Components.Add(new LoopAnimation(chaserShip));
                 chaserShip.Components.Add(new MoveHorizontal(chaserShip, -5));
@@ -148,11 +161,11 @@ public class Game
             case 8:
             case 9:
             case 10:
-                GameObject bird = new(gameFieldWidth, random.Next(30, gameFieldHeight - 30), Resource.bird,
+                GameObject bird = new(gameFieldWidth, random.Next(ground.Y - 100, ground.Y), Resource.bird,
                     GameObjectType.Bird, 1, new List<Component>());
                 bird.Components.Add(new LoopAnimation(bird));
                 bird.Components.Add(new MoveHorizontal(bird, -5));
-                bird.Components.Add(new EnemyDodge(bird, 10, 3));
+                bird.Components.Add(new BirdDodge(bird, 5, 3));
                 Create(bird);
                 break;
             default:
@@ -178,22 +191,23 @@ public class Game
         if (gameObject.Health > 0)
             return false;
 
-        GameObject explosion = new(gameObject.X, gameObject.Y, Resource.explosion, GameObjectType.Effect, 1,
-            new List<Component>());
-
+        GameObject explosion = new(gameObject.X, gameObject.Y, Resource.explosion, GameObjectType.Effect, 1, new List<Component>());
         explosion.Components.Add(new LoopAnimationFollowedByDeletion(explosion, Delete));
+        explosion.Size = gameObject.Size;
         Create(explosion);
 
-        Delete(gameObject);
+        gameObjectsToDelete.Add(gameObject);
+
+        if (gameObject.Type == GameObjectType.Player)
+            GameState = GameState.Defeat;
 
         return true;
     }
 
-    //todo. !!!crutch!!!
+    //
     private void CreatePlayerBullet(int x, int y)
     {
-        GameObject playerBullet =
-            new(x, y, Resource.player_shot, GameObjectType.PlayerBullet, 1, new List<Component>());
+        GameObject playerBullet = new(x, y, Resource.player_shot, GameObjectType.PlayerBullet, 1, new List<Component>());
         playerBullet.Components.Add(new MoveHorizontal(playerBullet, 10));
 
         Create(playerBullet);
@@ -201,10 +215,26 @@ public class Game
 
     private void CreateEnemyBullet(int x, int y)
     {
-        GameObject enemyBullet =
-            new(x, y, Resource.enemy_shot, GameObjectType.EnemyBullet, 1, new List<Component>());
+        GameObject enemyBullet = new(x, y, Resource.enemy_shot, GameObjectType.EnemyBullet, 1, new List<Component>());
         enemyBullet.Components.Add(new MoveHorizontal(enemyBullet, -10));
 
         Create(enemyBullet);
+    }
+    //
+
+    public void Restart()
+    {
+        gameObjects.Clear();
+        gameObjectsToAdd.Clear();
+        gameObjectsToDelete.Clear();
+        Score = 0;
+
+        playerShip = new GameObject(200, ground.Y/2, Resource.player_ship, GameObjectType.Player, 10, new List<Component>());
+        playerShip.Components.Add(new LoopAnimation(playerShip));
+        playerDodgeComponent = new Dodge(playerShip, 10, 3);
+        playerShip.Components.Add(playerDodgeComponent);
+        playerFireComponent = new Fire(playerShip, CreatePlayerBullet, 10);
+        playerShip.Components.Add(playerFireComponent);
+        gameObjects.Add(playerShip);
     }
 }

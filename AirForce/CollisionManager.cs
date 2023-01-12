@@ -2,7 +2,7 @@
 
 public static class CollisionManager
 {
-    private static readonly Dictionary<GameObjectType, GameObjectType[]> collisions = new()
+    private static readonly Dictionary<GameObjectType, GameObjectType[]> Collisions = new()
     {
         {
             GameObjectType.Meteor,
@@ -56,7 +56,7 @@ public static class CollisionManager
 
     private static bool HasCollisionBetweenTypes(GameObjectType tag1, GameObjectType tag2)
     {
-        return collisions.TryGetValue(tag1, out GameObjectType[] tags) &&
+        return Collisions.TryGetValue(tag1, out GameObjectType[] tags) &&
                tags.Any(tag => tag2 == tag);
     }
 

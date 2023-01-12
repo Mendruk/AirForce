@@ -2,16 +2,16 @@
 
 public class Fire : Component
 {
-    private readonly int reloadedTime;
-    private readonly Action<int, int> createAction;
-    private int currentReloadedTime;
-    private readonly GameObject gameObject;
+    protected readonly Action<int, int> CreateAction;
+    protected readonly GameObject GameObject;
+    protected readonly int ReloadedTime;
+    protected int CurrentReloadedTime;
 
     public Fire(GameObject gameObject, Action<int, int> createAction, int reloadedTime) : base(gameObject)
     {
-        this.gameObject = gameObject;
-        this.reloadedTime = reloadedTime;
-        this.createAction = createAction;
+        this.GameObject = gameObject;
+        this.ReloadedTime = reloadedTime;
+        this.CreateAction = createAction;
     }
 
     public override void Update(List<GameObject> gameObjects)
@@ -19,19 +19,19 @@ public class Fire : Component
         UpdateReloadingTime();
     }
 
-    public void Shoot()
+    public virtual void Shoot()
     {
-        if (currentReloadedTime < reloadedTime)
+        if (CurrentReloadedTime < ReloadedTime)
             return;
 
-        currentReloadedTime = 0;
+        CurrentReloadedTime = 0;
 
-        createAction(gameObject.X, gameObject.Y);
+        CreateAction(GameObject.X + GameObject.Size / 2, GameObject.Y);
     }
 
     private void UpdateReloadingTime()
     {
-        if (currentReloadedTime < reloadedTime)
-            currentReloadedTime++;
+        if (CurrentReloadedTime < ReloadedTime)
+            CurrentReloadedTime++;
     }
 }
