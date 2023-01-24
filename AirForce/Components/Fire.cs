@@ -3,15 +3,13 @@
 public class Fire : Component
 {
     protected readonly Action<int, int> CreateAction;
-    protected readonly GameObject GameObject;
     protected readonly int ReloadedTime;
     protected int CurrentReloadedTime;
 
     public Fire(GameObject gameObject, Action<int, int> createAction, int reloadedTime) : base(gameObject)
     {
-        this.GameObject = gameObject;
-        this.ReloadedTime = reloadedTime;
-        this.CreateAction = createAction;
+        ReloadedTime = reloadedTime;
+        CreateAction = createAction;
     }
 
     public override void Update(List<GameObject> gameObjects)

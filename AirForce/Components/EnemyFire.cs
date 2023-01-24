@@ -2,12 +2,9 @@
 
 public class EnemyFire : Fire
 {
-    private readonly GameObject gameObject;
-
     public EnemyFire(GameObject gameObject, Action<int, int> createAction, int reloadedTime) : base(gameObject,
         createAction, reloadedTime)
     {
-        this.gameObject = gameObject;
     }
 
     public override void Update(List<GameObject> gameObjects)
@@ -19,7 +16,7 @@ public class EnemyFire : Fire
             if (obj.Type != GameObjectType.Player)
                 continue;
 
-            if (HasShoot(gameObject, obj))
+            if (HasShoot( obj))
                 Shoot();
         }
     }
@@ -31,13 +28,13 @@ public class EnemyFire : Fire
 
         CurrentReloadedTime = 0;
 
-        CreateAction(gameObject.X - gameObject.Size / 2, gameObject.Y - gameObject.Size / 3);
-        CreateAction(gameObject.X - gameObject.Size / 2, gameObject.Y + gameObject.Size / 3);
+        CreateAction(GameObject.X - GameObject.Size / 2, GameObject.Y - GameObject.Size / 3);
+        CreateAction(GameObject.X - GameObject.Size / 2, GameObject.Y + GameObject.Size / 3);
     }
 
-    private bool HasShoot(GameObject gameObject1, GameObject gameObject2)
+    private bool HasShoot(GameObject gameObjectOther)
     {
-        return gameObject1.Y < gameObject2.Y + gameObject2.Size / 2 &&
-               gameObject1.Y > gameObject2.Y - gameObject2.Size / 2;
+        return GameObject.Y < gameObjectOther.Y + gameObjectOther.Size / 2 &&
+               GameObject.Y > gameObjectOther.Y - gameObjectOther.Size / 2;
     }
 }

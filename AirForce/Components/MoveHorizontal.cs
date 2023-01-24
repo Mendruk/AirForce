@@ -4,7 +4,6 @@ public class MoveHorizontal : Component
 {
     private readonly int speed;
 
-
     public MoveHorizontal(GameObject gameObject, int speed) : base(gameObject)
     {
         this.speed = speed;

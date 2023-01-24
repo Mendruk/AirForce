@@ -2,7 +2,7 @@
 
 public class BirdDodge : Dodge
 {
-    private Random random = new();
+    private readonly Random random = new();
 
     public BirdDodge(GameObject gameObject, int maxVerticalSpeed, int verticalAcceleration) : base(gameObject, maxVerticalSpeed, verticalAcceleration)
     {

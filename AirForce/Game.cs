@@ -16,6 +16,7 @@ public class Game
     private readonly List<GameObject> gameObjects = new();
     private readonly List<GameObject> gameObjectsToAdd = new();
     private readonly List<GameObject> gameObjectsToDelete = new();
+    private readonly CollisionManager collisionManager;
     private readonly Rectangle ground;
 
     public GameState GameState = GameState.Play;
@@ -49,12 +50,14 @@ public class Game
             Color.DarkSlateGray,
             Color.CadetBlue);
 
+        collisionManager = new CollisionManager();
+
         Restart();
     }
 
     public void Update()
     {
-        foreach ((GameObject? gameObject1, GameObject? gameObject2) in CollisionManager.Collision(gameObjects))
+        foreach ((GameObject? gameObject1, GameObject? gameObject2) in collisionManager.Collision(gameObjects))
             CollideGameObjects(gameObject1, gameObject2);
 
         foreach (GameObject gameObject in gameObjects)
