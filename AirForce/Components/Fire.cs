@@ -2,14 +2,14 @@
 
 public class Fire : Component
 {
-    protected readonly Action<int, int> CreateAction;
+    protected readonly Action<int, int> CreateBullet;
     protected readonly int ReloadedTime;
     protected int CurrentReloadedTime;
 
-    public Fire(GameObject gameObject, Action<int, int> createAction, int reloadedTime) : base(gameObject)
+    public Fire(GameObject gameObject, Action<int, int> createBullet, int reloadedTime) : base(gameObject)
     {
         ReloadedTime = reloadedTime;
-        CreateAction = createAction;
+        CreateBullet = createBullet;
     }
 
     public override void Update(List<GameObject> gameObjects)
@@ -24,7 +24,7 @@ public class Fire : Component
 
         CurrentReloadedTime = 0;
 
-        CreateAction(GameObject.X + GameObject.Size / 2, GameObject.Y);
+        CreateBullet(GameObject.X + GameObject.Size / 2 , GameObject.Y);
     }
 
     private void UpdateReloadingTime()

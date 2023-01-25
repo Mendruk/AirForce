@@ -17,6 +17,7 @@ public class Game
     private readonly List<GameObject> gameObjectsToAdd = new();
     private readonly List<GameObject> gameObjectsToDelete = new();
     private readonly CollisionManager collisionManager;
+    private readonly GameObjectBuilder gameObjectBuilder;
     private readonly Rectangle ground;
 
     public GameState GameState = GameState.Play;
@@ -51,6 +52,8 @@ public class Game
             Color.CadetBlue);
 
         collisionManager = new CollisionManager();
+        //Fragility
+        gameObjectBuilder = new GameObjectBuilder(Create);
 
         Restart();
     }
@@ -135,41 +138,22 @@ public class Game
         switch (randomNumber)
         {
             case 1:
-                GameObject meteor = new(random.Next(0, gameFieldWidth / 2),0, Resource.asteroid,
-                    GameObjectType.Meteor, 10, new List<Component>());
-                meteor.Components.Add(new MoveHorizontal(meteor, -5));
-                meteor.Components.Add(new MoveVertical(meteor, 5));
-                Create(meteor);
+                gameObjectBuilder.CreateMeteor(random.Next(0, gameFieldWidth / 2), 0);
                 break;
             case 2:
             case 3:
-                GameObject bomberShip = new(gameFieldWidth, random.Next(30, ground.Y), Resource.bomber_ship,
-                    GameObjectType.Enemy, 3, new List<Component>());
-                bomberShip.Components.Add(new LoopAnimation(bomberShip));
-                bomberShip.Components.Add(new MoveHorizontal(bomberShip, -3));
-                bomberShip.Components.Add(new EnemyFire(bomberShip, CreateEnemyBullet, 20));
-                Create(bomberShip);
+                gameObjectBuilder.CreateBomberShip(gameFieldWidth, random.Next(30, ground.Y));
                 break;
             case 4:
             case 5:
             case 6:
-                GameObject chaserShip = new(gameFieldWidth, random.Next(30, ground.Y), Resource.chaser_ship,
-                    GameObjectType.Enemy, 1, new List<Component>());
-                chaserShip.Components.Add(new LoopAnimation(chaserShip));
-                chaserShip.Components.Add(new MoveHorizontal(chaserShip, -5));
-                chaserShip.Components.Add(new EnemyDodge(chaserShip, 10, 3));
-                Create(chaserShip);
+                gameObjectBuilder.CreateChaserShip(gameFieldWidth, random.Next(30, ground.Y));
                 break;
             case 7:
             case 8:
             case 9:
             case 10:
-                GameObject bird = new(gameFieldWidth, random.Next(ground.Y - 100, ground.Y), Resource.bird,
-                    GameObjectType.Bird, 1, new List<Component>());
-                bird.Components.Add(new LoopAnimation(bird));
-                bird.Components.Add(new MoveHorizontal(bird, -5));
-                bird.Components.Add(new BirdDodge(bird, 5, 3));
-                Create(bird);
+                gameObjectBuilder.CreateBird(gameFieldWidth, random.Next(ground.Y - 100, ground.Y));
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(randomNumber), randomNumber, null);
@@ -207,24 +191,6 @@ public class Game
         return true;
     }
 
-    //
-    private void CreatePlayerBullet(int x, int y)
-    {
-        GameObject playerBullet = new(x, y, Resource.player_shot, GameObjectType.PlayerBullet, 1, new List<Component>());
-        playerBullet.Components.Add(new MoveHorizontal(playerBullet, 10));
-
-        Create(playerBullet);
-    }
-
-    private void CreateEnemyBullet(int x, int y)
-    {
-        GameObject enemyBullet = new(x, y, Resource.enemy_shot, GameObjectType.EnemyBullet, 1, new List<Component>());
-        enemyBullet.Components.Add(new MoveHorizontal(enemyBullet, -10));
-
-        Create(enemyBullet);
-    }
-    //
-
     public void Restart()
     {
         gameObjects.Clear();
@@ -232,11 +198,12 @@ public class Game
         gameObjectsToDelete.Clear();
         Score = 0;
 
+        //If you add it to the GameObjectBuilder, the playerShip control will break.
         playerShip = new GameObject(200, ground.Y/2, Resource.player_ship, GameObjectType.Player, 10, new List<Component>());
         playerShip.Components.Add(new LoopAnimation(playerShip));
         playerDodgeComponent = new Dodge(playerShip, 10, 3);
         playerShip.Components.Add(playerDodgeComponent);
-        playerFireComponent = new Fire(playerShip, CreatePlayerBullet, 10);
+        playerFireComponent = new Fire(playerShip, gameObjectBuilder.CreatePlayerBullet, 10);
         playerShip.Components.Add(playerFireComponent);
         gameObjects.Add(playerShip);
     }
