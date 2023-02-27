@@ -1,4 +1,5 @@
-﻿using AirForce.Components;
+﻿using AirForce.Commands;
+using AirForce.Components;
 
 namespace AirForce;
 
@@ -37,9 +38,9 @@ public class GameObject
                 bitmap.Width / FrameNumber, bitmap.Height);
     }
 
-    public void Update(List<GameObject> gameObjects)
+    public void Update(List<GameObject> gameObjects, Queue<ICommand> commands)
     {
-        foreach (Component component in Components) component.Update(gameObjects);
+        foreach (Component component in Components) component.Update(gameObjects, commands);
     }
 
     public void Draw(Graphics graphics)

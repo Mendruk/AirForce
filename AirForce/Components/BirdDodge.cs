@@ -1,4 +1,6 @@
-﻿namespace AirForce.Components;
+﻿using AirForce.Commands;
+
+namespace AirForce.Components;
 
 public class BirdDodge : Dodge
 {
@@ -8,7 +10,7 @@ public class BirdDodge : Dodge
     {
     }
 
-    public override void Update(List<GameObject> gameObjects)
+    public override void Update(List<GameObject> gameObjects, Queue<ICommand> commands)
     {
         if (random.Next(0, 2) == 0)
         {
@@ -19,6 +21,6 @@ public class BirdDodge : Dodge
             DodgeUp();
         }
 
-        UpdateDodge();
+        UpdateDodge(commands);
     }
 }

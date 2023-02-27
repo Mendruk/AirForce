@@ -1,4 +1,6 @@
-﻿namespace AirForce.Components;
+﻿using AirForce.Commands;
+
+namespace AirForce.Components;
 
 public class LoopAnimation : Component
 {
@@ -6,11 +8,11 @@ public class LoopAnimation : Component
     {
     }
 
-    public override void Update(List<GameObject> gameObjects)
+    public override void Update(List<GameObject> gameObjects, Queue<ICommand> commands)
     {
-        GameObject.CurrentFrameNumber += 1;
-
-        if (GameObject.CurrentFrameNumber >= GameObject.FrameNumber)
+        if (GameObject.CurrentFrameNumber >= GameObject.FrameNumber-1)
             GameObject.CurrentFrameNumber = 0;
+
+        GameObject.CurrentFrameNumber++;
     }
 }

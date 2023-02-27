@@ -1,4 +1,6 @@
-﻿namespace AirForce.Components;
+﻿using AirForce.Commands;
+
+namespace AirForce.Components;
 
 public class MoveVertical : Component
 {
@@ -9,8 +11,8 @@ public class MoveVertical : Component
         this.speed = speed;
     }
 
-    public override void Update(List<GameObject> gameObjects)
+    public override void Update(List<GameObject> gameObjects, Queue<ICommand> commands)
     {
-        GameObject.Y += speed;
+        commands.Enqueue(new CommandMove(0, speed, GameObject));
     }
 }

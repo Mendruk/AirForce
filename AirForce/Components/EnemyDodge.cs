@@ -1,4 +1,6 @@
-﻿namespace AirForce.Components;
+﻿using AirForce.Commands;
+
+namespace AirForce.Components;
 
 public class EnemyDodge : Dodge
 {
@@ -6,7 +8,7 @@ public class EnemyDodge : Dodge
     {
     }
 
-    public override void Update(List<GameObject> gameObjects)
+    public override void Update(List<GameObject> gameObjects, Queue<ICommand> commands)
     {
         foreach (GameObject obj in gameObjects)
         {
@@ -21,7 +23,7 @@ public class EnemyDodge : Dodge
             break;
         }
         
-        UpdateDodge();
+        UpdateDodge(commands);
     }
 
     private bool HasDodge(GameObject gameObject1, GameObject gameObject2, out DodgeDirection direction)

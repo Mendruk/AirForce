@@ -1,4 +1,6 @@
-﻿namespace AirForce.Components;
+﻿using AirForce.Commands;
+
+namespace AirForce.Components;
 
 public abstract class Component
 {
@@ -9,5 +11,5 @@ public abstract class Component
         GameObject = gameObject;
     }
 
-    public abstract void Update(List<GameObject> gameObjects);
+    public abstract void Update(List<GameObject> gameObjects,Queue<ICommand> commands);
 }

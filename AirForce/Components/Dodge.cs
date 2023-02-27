@@ -1,4 +1,6 @@
-﻿namespace AirForce.Components;
+﻿using AirForce.Commands;
+
+namespace AirForce.Components;
 
 public class Dodge : Component
 {
@@ -12,9 +14,9 @@ public class Dodge : Component
         this.verticalAcceleration = verticalAcceleration;
     }
 
-    public override void Update(List<GameObject> gameObjects)
+    public override void Update(List<GameObject> gameObjects, Queue<ICommand> commands)
     {
-        UpdateDodge();
+        UpdateDodge(commands);
     }
 
     public void DodgeUp()
@@ -27,7 +29,7 @@ public class Dodge : Component
         currentVerticalSpeed += verticalAcceleration;
     }
 
-    public void UpdateDodge()
+    public void UpdateDodge(Queue<ICommand> commands)
     {
         if (currentVerticalSpeed > maxVerticalSpeed)
             currentVerticalSpeed = maxVerticalSpeed;
@@ -41,7 +43,7 @@ public class Dodge : Component
         if (currentVerticalSpeed < 0)
             currentVerticalSpeed += 1;
 
-        GameObject.Y += currentVerticalSpeed;
+        commands.Enqueue(new CommandMove(0,currentVerticalSpeed, GameObject));
 
         if (GameObject.Y < GameObject.Size / 2)
             GameObject.Y = GameObject.Size / 2;

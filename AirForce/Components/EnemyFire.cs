@@ -1,15 +1,17 @@
-﻿namespace AirForce.Components;
+﻿using AirForce.Commands;
+
+namespace AirForce.Components;
 
 public class EnemyFire : Fire
 {
-    public EnemyFire(GameObject gameObject, Action<int, int> createBullet, int reloadedTime) : base(gameObject,
-        createBullet, reloadedTime)
+    public EnemyFire(List<GameObject> gameObjectsToAdd, List<GameObject> gameObjectsToRemove, GameObject gameObject, int reloadedTime, Func<int, int, GameObject> getBullet) 
+        : base(gameObjectsToAdd, gameObjectsToRemove, gameObject, reloadedTime,getBullet)
     {
     }
 
-    public override void Update(List<GameObject> gameObjects)
+    public override void Update(List<GameObject> gameObjects, Queue<ICommand> commands)
     {
-        base.Update(gameObjects);
+        base.Update(gameObjects,commands);
 
         foreach (GameObject obj in gameObjects)
         {
@@ -17,19 +19,19 @@ public class EnemyFire : Fire
                 continue;
 
             if (HasShoot( obj))
-                Shoot();
+                Shoot(commands);
         }
     }
 
-    public override void Shoot()
+    public override void Shoot(Queue<ICommand> commands)
     {
         if (CurrentReloadedTime < ReloadedTime)
             return;
 
         CurrentReloadedTime = 0;
 
-        CreateBullet(GameObject.X - GameObject.Size / 2, GameObject.Y - GameObject.Size / 3);
-        CreateBullet(GameObject.X - GameObject.Size / 2, GameObject.Y + GameObject.Size / 3);
+        commands.Enqueue(new CommandCreate(gameObjectsToAdd, gameObjectsToRemove, getBullet(GameObject.X - GameObject.Size / 2, GameObject.Y - GameObject.Size / 3)));
+        commands.Enqueue(new CommandCreate( gameObjectsToAdd, gameObjectsToRemove, getBullet(GameObject.X - GameObject.Size / 2, GameObject.Y + GameObject.Size / 3)));
     }
 
     private bool HasShoot(GameObject gameObjectOther)
