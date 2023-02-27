@@ -13,6 +13,8 @@ public class MoveHorizontal : Component
 
     public override void Update(List<GameObject> gameObjects, Queue<ICommand> commands)
     {
-        commands.Enqueue(new CommandMove(speed, 0, GameObject));
+        ICommand command = new CommandMove(speed, 0, GameObject);
+        commands.Enqueue(command);
+        command.Execute();
     }
 }

@@ -13,6 +13,9 @@ public class MoveVertical : Component
 
     public override void Update(List<GameObject> gameObjects, Queue<ICommand> commands)
     {
-        commands.Enqueue(new CommandMove(0, speed, GameObject));
+        ICommand command = new CommandMove(0, speed, GameObject);
+        commands.Enqueue(command);
+        command.Execute();
+
     }
 }

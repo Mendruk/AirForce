@@ -30,8 +30,17 @@ public class EnemyFire : Fire
 
         CurrentReloadedTime = 0;
 
-        commands.Enqueue(new CommandCreate(gameObjectsToAdd, gameObjectsToRemove, getBullet(GameObject.X - GameObject.Size / 2, GameObject.Y - GameObject.Size / 3)));
-        commands.Enqueue(new CommandCreate( gameObjectsToAdd, gameObjectsToRemove, getBullet(GameObject.X - GameObject.Size / 2, GameObject.Y + GameObject.Size / 3)));
+        ICommand commandFirst = new CommandCreate(gameObjectsToAdd, gameObjectsToRemove,
+            getBullet(GameObject.X - GameObject.Size / 2, GameObject.Y - GameObject.Size / 3));
+
+        ICommand commandSecond = new CommandCreate(gameObjectsToAdd, gameObjectsToRemove,
+            getBullet(GameObject.X - GameObject.Size / 2, GameObject.Y + GameObject.Size / 3));
+
+        commands.Enqueue(commandFirst);
+        commands.Enqueue(commandSecond);
+
+        commandFirst.Execute();
+        commandSecond.Execute();
     }
 
     private bool HasShoot(GameObject gameObjectOther)

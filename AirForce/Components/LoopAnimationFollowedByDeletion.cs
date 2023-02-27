@@ -12,14 +12,17 @@ public class LoopAnimationFollowedByDeletion : Component
         this.gameObjectsToAdd = gameObjectsToAdd;
         this.gameObjectsToRemove = gameObjectsToRemove;
     }
-
+     
     public override void Update(List<GameObject> gameObjects, Queue<ICommand> commands)
     {
 
         if (GameObject.CurrentFrameNumber >= GameObject.FrameNumber-1)
         {
             GameObject.CurrentFrameNumber = 0;
-            commands.Enqueue(new CommandDestroy(gameObjectsToAdd, gameObjectsToRemove, GameObject));
+
+            ICommand command = new CommandDestroy(gameObjectsToAdd, gameObjectsToRemove, GameObject);
+            commands.Enqueue(command);
+            command.Execute();
         }
 
         GameObject.CurrentFrameNumber++;

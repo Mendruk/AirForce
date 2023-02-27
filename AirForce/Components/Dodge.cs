@@ -43,7 +43,9 @@ public class Dodge : Component
         if (currentVerticalSpeed < 0)
             currentVerticalSpeed += 1;
 
-        commands.Enqueue(new CommandMove(0,currentVerticalSpeed, GameObject));
+        ICommand command = new CommandMove(0, currentVerticalSpeed, GameObject);
+        commands.Enqueue(command);
+        command.Execute();
 
         if (GameObject.Y < GameObject.Size / 2)
             GameObject.Y = GameObject.Size / 2;

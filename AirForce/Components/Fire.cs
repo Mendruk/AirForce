@@ -33,8 +33,10 @@ public class Fire : Component
 
         CurrentReloadedTime = 0;
 
-        commands.Enqueue(new CommandCreate(gameObjectsToAdd, gameObjectsToRemove,
-            getBullet(GameObject.X + GameObject.Size / 2,GameObject.Y)));
+        ICommand command = new CommandCreate(gameObjectsToAdd, gameObjectsToRemove,
+            getBullet(GameObject.X + GameObject.Size / 2, GameObject.Y));
+        commands.Enqueue(command);
+        command.Execute(); 
     }
 
     private void UpdateReloadingTime()

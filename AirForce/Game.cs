@@ -55,7 +55,6 @@ public class Game
             Color.CadetBlue);
 
         collisionManager = new CollisionManager();
-        //Fragility
         gameObjectBuilder = new GameObjectBuilder(gameObjectsToAdd,gameObjectsToRemove);
 
         Restart();
@@ -69,7 +68,7 @@ public class Game
                 PlayUpdate();
                 break;
             case GameState.Rewind:
-                RewindUpdate();
+                //RewindUpdate();
                 break;
             case GameState.Defeat:
                 RewindUpdate();
@@ -119,8 +118,8 @@ public class Game
         for (int i = 0; i < commandsToExecute.Count; i++)
         {
             ICommand command = commandsToExecute.Dequeue();
-            command.Execute();
             commandsOnFrame.Add(command);
+            //command.Execute();
         }
 
         commandsToUndo.Push(commandsOnFrame);
@@ -169,21 +168,13 @@ public class Game
                 graphics.DrawString("Score: " + Score, font, Brushes.CadetBlue, gameFieldWidth / 5, gameFieldHeight * 4 / 5);
                 break;
             case GameState.Defeat:
+                graphics.DrawString("Health: " + playerShip.Health, font, Brushes.CadetBlue, gameFieldWidth / 15, gameFieldHeight * 4 / 5);
+                graphics.DrawString("Score: " + Score, font, Brushes.CadetBlue, gameFieldWidth / 5, gameFieldHeight * 4 / 5);
                 graphics.DrawString("You Lose.\n You`re score " + Score +"\nPress SPACE to start new game", font, Brushes.CadetBlue, gameFieldWidth /2, gameFieldHeight /2,Format);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(GameState), GameState, null);
         }
-    }
-
-    private void Create(GameObject gameObject)
-    {
-        gameObjectsToAdd.Add(gameObject);
-    }
-
-    private void Delete(GameObject gameObject)
-    {
-        gameObjectsToRemove.Add(gameObject);
     }
 
     private void CreateRandomEnemy()
@@ -193,26 +184,33 @@ public class Game
         switch (randomNumber)
         {
             case 1:
-                commandsToExecute.Enqueue(new CommandCreate(gameObjectsToAdd,gameObjectsToRemove,
-                    gameObjectBuilder.GetMeteor(random.Next(0, gameFieldWidth / 2), 0)));
+                ICommand commandCreateMeteor = new CommandCreate(gameObjectsToAdd, gameObjectsToRemove,
+                    gameObjectBuilder.GetMeteor(random.Next(0, gameFieldWidth / 2), 0));
+                commandsToExecute.Enqueue(commandCreateMeteor);
+                commandCreateMeteor.Execute();
                 break;
             case 2:
             case 3:
-                commandsToExecute.Enqueue(new CommandCreate(gameObjectsToAdd, gameObjectsToRemove,
-                    gameObjectBuilder.GetBomberShip(gameFieldWidth, random.Next(30, ground.Y))));
+                ICommand commandCreateBomberShip = new CommandCreate(gameObjectsToAdd, gameObjectsToRemove,
+                    gameObjectBuilder.GetBomberShip(gameFieldWidth, random.Next(30, ground.Y)));
+                commandsToExecute.Enqueue(commandCreateBomberShip);
                 break;
             case 4:
             case 5:
             case 6:
-                commandsToExecute.Enqueue(new CommandCreate(gameObjectsToAdd, gameObjectsToRemove,
-                    gameObjectBuilder.GetChaserShip(gameFieldWidth, random.Next(30, ground.Y))));
+                ICommand commandCreateChaserShip = new CommandCreate(gameObjectsToAdd, gameObjectsToRemove,
+                    gameObjectBuilder.GetChaserShip(gameFieldWidth, random.Next(30, ground.Y)));
+                commandsToExecute.Enqueue(commandCreateChaserShip);
+                commandCreateChaserShip.Execute();
                 break;
             case 7:
             case 8:
             case 9:
             case 10:
-                commandsToExecute.Enqueue(new CommandCreate(gameObjectsToAdd, gameObjectsToRemove,
-                    gameObjectBuilder.GetBird(gameFieldWidth, random.Next(ground.Y - 100, ground.Y))));
+                ICommand commandCrateBird = new CommandCreate(gameObjectsToAdd, gameObjectsToRemove,
+                    gameObjectBuilder.GetBird(gameFieldWidth, random.Next(ground.Y - 100, ground.Y)));
+                commandsToExecute.Enqueue(commandCrateBird);
+                commandCrateBird.Execute();
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(randomNumber), randomNumber, null);
@@ -227,13 +225,18 @@ public class Game
              && gameObject1.Type == GameObjectType.Enemy) ||
             (TryDestroyByDamage(gameObject1Health, gameObject2)
              && gameObject2.Type == GameObjectType.Enemy))
-            commandsToExecute.Enqueue(new CommandAddScore(1,this));
+        {
+            ICommand command = new CommandAddScore(1, this);
+            commandsToExecute.Enqueue(command);
+            command.Execute();
+        }
     }
 
     public bool TryDestroyByDamage(int damage, GameObject gameObject)
     {
-
-        commandsToExecute.Enqueue(new CommandTakeDamage(damage,gameObject));
+        ICommand commandTakeDamage = new CommandTakeDamage(damage, gameObject);
+        commandsToExecute.Enqueue(commandTakeDamage);
+        commandTakeDamage.Execute();
 
         if (gameObject.Health > 0)
             return false;
@@ -241,10 +244,15 @@ public class Game
         GameObject explosion = new(gameObject.X, gameObject.Y, Resource.explosion, GameObjectType.Effect, 1, new List<Component>());
         explosion.Components.Add(new LoopAnimationFollowedByDeletion(explosion, gameObjectsToAdd,gameObjectsToRemove));
         explosion.Size = gameObject.Size;
-        commandsToExecute.Enqueue(new CommandCreate(gameObjectsToAdd,gameObjectsToRemove,explosion));
 
-        commandsToExecute.Enqueue(new CommandDestroy(gameObjectsToAdd,gameObjectsToRemove,gameObject));
+        ICommand commandCreateExplosion= new CommandCreate(gameObjectsToAdd, gameObjectsToRemove, explosion);
+        commandsToExecute.Enqueue(commandCreateExplosion);
+        commandCreateExplosion.Execute();
 
+        ICommand commandDestroy = new CommandDestroy(gameObjectsToAdd, gameObjectsToRemove, gameObject);
+        commandsToExecute.Enqueue(commandDestroy);
+        commandDestroy.Execute();
+        
         if (gameObject.Type == GameObjectType.Player)
             GameState = GameState.Defeat;
 

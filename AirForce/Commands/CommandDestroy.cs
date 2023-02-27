@@ -2,14 +2,14 @@
 
 namespace AirForce.Commands
 {
-    public class CommandCreate : ICommand
+    public class CommandDestroy : ICommand
     {
         private readonly GameObject receiver;
 
         private List<GameObject> gameObjectsToAdd;
         private List<GameObject> gameObjectsToRemove;
 
-        public CommandCreate(List<GameObject> gameObjectsToAdd, List<GameObject> gameObjectsToRemove, GameObject receiver)
+        public CommandDestroy(List<GameObject> gameObjectsToAdd, List<GameObject> gameObjectsToRemove, GameObject receiver)
         {
             this.receiver = receiver;
             this.gameObjectsToAdd = gameObjectsToAdd;
@@ -18,12 +18,12 @@ namespace AirForce.Commands
 
         public void Execute()
         {
-            gameObjectsToAdd.Add(receiver);
+            gameObjectsToRemove.Add(receiver);
         }
 
         public void Undo()
         {
-            gameObjectsToRemove.Add(receiver);
+            gameObjectsToAdd.Add(receiver);
         }
     }
 }

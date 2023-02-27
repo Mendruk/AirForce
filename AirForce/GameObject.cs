@@ -40,7 +40,8 @@ public class GameObject
 
     public void Update(List<GameObject> gameObjects, Queue<ICommand> commands)
     {
-        foreach (Component component in Components) component.Update(gameObjects, commands);
+        foreach (Component component in Components) 
+            component.Update(gameObjects, commands);
     }
 
     public void Draw(Graphics graphics)
