@@ -10,9 +10,14 @@ public class LoopAnimation : Component
 
     public override void Update(List<GameObject> gameObjects, Queue<ICommand> commands)
     {
-        if (GameObject.CurrentFrameNumber >= GameObject.FrameNumber-1)
+        ICommand command = new CommandAnimationNextFrame(GameObject);
+        commands.Enqueue(command);
+
+        command.Execute();
+
+        if (GameObject.CurrentFrameNumber == GameObject.FrameNumber)
             GameObject.CurrentFrameNumber = 0;
 
-        GameObject.CurrentFrameNumber++;
+        
     }
 }

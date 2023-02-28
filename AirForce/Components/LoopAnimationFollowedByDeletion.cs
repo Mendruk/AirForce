@@ -15,8 +15,12 @@ public class LoopAnimationFollowedByDeletion : Component
      
     public override void Update(List<GameObject> gameObjects, Queue<ICommand> commands)
     {
+        ICommand commandNextFrame = new CommandAnimationNextFrame(GameObject);
+        commands.Enqueue(commandNextFrame);
 
-        if (GameObject.CurrentFrameNumber >= GameObject.FrameNumber-1)
+        commandNextFrame.Execute();
+
+        if (GameObject.CurrentFrameNumber >= GameObject.FrameNumber)
         {
             GameObject.CurrentFrameNumber = 0;
 
@@ -24,7 +28,5 @@ public class LoopAnimationFollowedByDeletion : Component
             commands.Enqueue(command);
             command.Execute();
         }
-
-        GameObject.CurrentFrameNumber++;
     }
 }

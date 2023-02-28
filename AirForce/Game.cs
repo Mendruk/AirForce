@@ -68,10 +68,10 @@ public class Game
                 PlayUpdate();
                 break;
             case GameState.Rewind:
-                //RewindUpdate();
+                RewindUpdate();
                 break;
             case GameState.Defeat:
-                RewindUpdate();
+                PlayUpdate();
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -83,6 +83,9 @@ public class Game
     //todo rename
     private void PlayUpdate()
     {
+        if (playerShip.Health <= 0)
+            GameState = GameState.Defeat;
+
         foreach ((GameObject? gameObject1, GameObject? gameObject2) in collisionManager.Collision(gameObjects))
             CollideGameObjects(gameObject1, gameObject2);
 
@@ -123,6 +126,7 @@ public class Game
         }
 
         commandsToUndo.Push(commandsOnFrame);
+
     }
 
     private void RewindUpdate()
@@ -163,18 +167,22 @@ public class Game
 
         switch (GameState )
         {
-            case GameState.Play:        
-                graphics.DrawString("Health: " + playerShip.Health, font, Brushes.CadetBlue, gameFieldWidth / 15, gameFieldHeight * 4 / 5); 
-                graphics.DrawString("Score: " + Score, font, Brushes.CadetBlue, gameFieldWidth / 5, gameFieldHeight * 4 / 5);
+            case GameState.Play:
                 break;
             case GameState.Defeat:
-                graphics.DrawString("Health: " + playerShip.Health, font, Brushes.CadetBlue, gameFieldWidth / 15, gameFieldHeight * 4 / 5);
-                graphics.DrawString("Score: " + Score, font, Brushes.CadetBlue, gameFieldWidth / 5, gameFieldHeight * 4 / 5);
-                graphics.DrawString("You Lose.\n You`re score " + Score +"\nPress SPACE to start new game", font, Brushes.CadetBlue, gameFieldWidth /2, gameFieldHeight /2,Format);
+                graphics.DrawString("You Lose.\n You`re score " + Score +
+                                    "\nPress SPACE to start new game " +
+                                    "\nPress SHIFT to rewind", font, Brushes.CadetBlue, gameFieldWidth /2, gameFieldHeight /2,Format);
+                break;
+            case GameState.Rewind:
+                graphics.DrawString("REWIND", font, Brushes.CadetBlue, gameFieldWidth / 2, gameFieldHeight / 2, Format);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(GameState), GameState, null);
         }
+
+        graphics.DrawString("Health: " + playerShip.Health, font, Brushes.CadetBlue, gameFieldWidth / 15, gameFieldHeight * 4 / 5);
+        graphics.DrawString("Score: " + Score, font, Brushes.CadetBlue, gameFieldWidth / 5, gameFieldHeight * 4 / 5);
     }
 
     private void CreateRandomEnemy()
@@ -194,6 +202,7 @@ public class Game
                 ICommand commandCreateBomberShip = new CommandCreate(gameObjectsToAdd, gameObjectsToRemove,
                     gameObjectBuilder.GetBomberShip(gameFieldWidth, random.Next(30, ground.Y)));
                 commandsToExecute.Enqueue(commandCreateBomberShip);
+                commandCreateBomberShip.Execute();
                 break;
             case 4:
             case 5:
@@ -243,7 +252,7 @@ public class Game
 
         GameObject explosion = new(gameObject.X, gameObject.Y, Resource.explosion, GameObjectType.Effect, 1, new List<Component>());
         explosion.Components.Add(new LoopAnimationFollowedByDeletion(explosion, gameObjectsToAdd,gameObjectsToRemove));
-        explosion.Size = gameObject.Size;
+        explosion.Size = gameObject.Size*2;
 
         ICommand commandCreateExplosion= new CommandCreate(gameObjectsToAdd, gameObjectsToRemove, explosion);
         commandsToExecute.Enqueue(commandCreateExplosion);
@@ -252,9 +261,6 @@ public class Game
         ICommand commandDestroy = new CommandDestroy(gameObjectsToAdd, gameObjectsToRemove, gameObject);
         commandsToExecute.Enqueue(commandDestroy);
         commandDestroy.Execute();
-        
-        if (gameObject.Type == GameObjectType.Player)
-            GameState = GameState.Defeat;
 
         return true;
     }

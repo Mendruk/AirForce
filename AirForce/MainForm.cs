@@ -53,6 +53,11 @@ public partial class MainForm : Form
                 game.Restart();
             }
         }
+
+        if (e.KeyCode == Keys.ShiftKey)
+        {
+            game.GameState=GameState.Rewind;
+        }
     }
 
     private void MainForm_KeyUp(object sender, KeyEventArgs e)
@@ -65,5 +70,11 @@ public partial class MainForm : Form
 
         if (e.KeyCode == Keys.Space)
             game.IsFire = false;
+
+        if (e.KeyCode == Keys.ShiftKey)
+        {
+            if (game.GameState == GameState.Rewind)
+                game.GameState = GameState.Play;
+        }
     }
 }
