@@ -108,10 +108,10 @@ public class Game
         }
 
         if (IsMoveUp)
-            playerDodgeComponent.DodgeUp();
+            playerDodgeComponent.DodgeUp(commandsToExecute);
 
         if (IsMoveDown)
-            playerDodgeComponent.DodgeDown();
+            playerDodgeComponent.DodgeDown(commandsToExecute);
 
         if (IsFire)
             playerFireComponent.Shoot(commandsToExecute);
@@ -270,6 +270,7 @@ public class Game
         gameObjects.Clear();
         gameObjectsToAdd.Clear();
         gameObjectsToRemove.Clear();
+        commandsToUndo.Clear();
         Score = 0;
 
         //If you add it to the GameObjectBuilder, the playerShip control will break.

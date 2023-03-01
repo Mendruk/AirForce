@@ -14,11 +14,11 @@ public class BirdDodge : Dodge
     {
         if (random.Next(0, 2) == 0)
         {
-            DodgeDown();
+            DodgeDown(commands);
         }
         else
         {
-            DodgeUp();
+            DodgeUp(commands);
         }
 
         UpdateDodge(commands);

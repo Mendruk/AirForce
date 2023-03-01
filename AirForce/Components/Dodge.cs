@@ -6,7 +6,7 @@ public class Dodge : Component
 {
     private readonly int maxVerticalSpeed;
     private readonly int verticalAcceleration;
-    private int currentVerticalSpeed;
+    public int currentVerticalSpeed;
 
     public Dodge(GameObject gameObject, int maxVerticalSpeed, int verticalAcceleration) : base(gameObject)
     {
@@ -19,14 +19,18 @@ public class Dodge : Component
         UpdateDodge(commands);
     }
 
-    public void DodgeUp()
+    public void DodgeUp(Queue<ICommand> commands)
     {
-        currentVerticalSpeed -= verticalAcceleration;
+        ICommand command = new CommandAddVerticalSpeed(-verticalAcceleration, this);
+        commands.Enqueue(command);
+        command.Execute();
     }
 
-    public void DodgeDown()
+    public void DodgeDown(Queue<ICommand> commands)
     {
-        currentVerticalSpeed += verticalAcceleration;
+        ICommand command = new CommandAddVerticalSpeed(verticalAcceleration, this);
+        commands.Enqueue(command);
+        command.Execute(); 
     }
 
     public void UpdateDodge(Queue<ICommand> commands)
@@ -38,10 +42,18 @@ public class Dodge : Component
             currentVerticalSpeed = -maxVerticalSpeed;
 
         if (currentVerticalSpeed > 0)
-            currentVerticalSpeed -= 1;
+        {
+            ICommand commandAddVertical = new CommandAddVerticalSpeed(-1, this);
+            commands.Enqueue(commandAddVertical);
+            commandAddVertical.Execute();
+        }
 
         if (currentVerticalSpeed < 0)
-            currentVerticalSpeed += 1;
+        {
+            ICommand commandAddVertical = new CommandAddVerticalSpeed(1, this);
+            commands.Enqueue(commandAddVertical);
+            commandAddVertical.Execute();
+        }
 
         ICommand command = new CommandMove(0, currentVerticalSpeed, GameObject);
         command.Execute();

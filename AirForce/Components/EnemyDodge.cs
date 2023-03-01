@@ -17,9 +17,9 @@ public class EnemyDodge : Dodge
                 continue;
 
             if (direction == DodgeDirection.Up)
-                DodgeUp();
+                DodgeUp(commands);
             else if (direction == DodgeDirection.Down)
-                DodgeDown();
+                DodgeDown(commands);
             break;
         }
         
